@@ -293,7 +293,7 @@ function showKoBanner(tab) {
     '    <div class="ko-stat"><span>Rischio netto</span><strong class="red">'+fe(rischio)+'</strong></div>'+
     '  </div>'+
     '</div>'+
-    '<button class="ko-banner-btn" onclick="doReset(''+tab+'')">&#8635; Salva nel Taccuino e ricomincia</button>';
+    '<button class="ko-banner-btn" onclick="doReset(\'' + tab + '\')">&#8635; Salva nel Taccuino e ricomincia</button>';
 
   // Inserisci dopo la tabella
   const tableWrap = document.querySelector('#page-'+tab+' .table-wrap');
