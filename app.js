@@ -274,11 +274,11 @@ function setEsito(tab, idx, val) {
 
 // ── KO Banner ──
 function showKoBanner(tab) {
-  const existing = document.querySelector('#ko-banner-'+tab);
+  // Rimuovi banner esistente
+  const existing = document.getElementById('ko-banner-'+tab);
   if (existing) existing.remove();
 
-  const { magCum, returnCur, doneCount, rischio, cfg } = calcTab(tab);
-  const pos = magCum > 0;
+  const { magCum, returnCur, doneCount, rischio } = calcTab(tab);
 
   const banner = document.createElement('div');
   banner.id = 'ko-banner-'+tab;
@@ -286,19 +286,18 @@ function showKoBanner(tab) {
   banner.innerHTML =
     '<div class="ko-banner-icon">⛔</div>'+
     '<div class="ko-banner-body">'+
-    '  <div class="ko-banner-title">Sessione terminata</div>'+
-    '  <div class="ko-banner-sub">Hai perso la cassa del bookmaker. Il magazzino è al sicuro.</div>'+
-    '  <div class="ko-banner-stats">'+
-    '    <div class="ko-stat"><span>Step raggiunto</span><strong>'+doneCount+' / 25</strong></div>'+
-    '    <div class="ko-stat"><span>Magazzino salvato</span><strong class="gold">'+fe(magCum)+'</strong></div>'+
-    '    <div class="ko-stat"><span>Rischio netto</span><strong class="red">'+fe(rischio)+'</strong></div>'+
-    '  </div>'+
-    '</div>'+
+    '<div class="ko-banner-title">Sessione terminata</div>'+
+    '<div class="ko-banner-sub">Hai perso la cassa del bookmaker. Il magazzino è al sicuro.</div>'+
+    '<div class="ko-banner-stats">'+
+    '<div class="ko-stat"><span>Step raggiunto</span><strong>'+doneCount+' / 25</strong></div>'+
+    '<div class="ko-stat"><span>Magazzino salvato</span><strong class="gold">'+fe(magCum)+'</strong></div>'+
+    '<div class="ko-stat"><span>Rischio netto</span><strong class="red">'+fe(rischio)+'</strong></div>'+
+    '</div></div>'+
     '<button class="ko-banner-btn" onclick="doReset(\'' + tab + '\')">&#8635; Salva nel Taccuino e ricomincia</button>';
 
-  // Inserisci dopo la tabella
-  const tableWrap = document.querySelector('#page-'+tab+' .table-wrap');
-  if (tableWrap) tableWrap.insertAdjacentElement('afterend', banner);
+  // Inserisci nel page container, dopo la formula-note
+  const page = document.getElementById('page-'+tab);
+  if (page) page.appendChild(banner);
 }
 
 function doReset(tab) {
@@ -368,7 +367,10 @@ function switchTab(tab) {
   });
   if (tab==='bilancio') buildBilancio();
   else if (tab==='taccuino') buildTaccuino();
-  else recalc(tab);
+  else {
+    recalc(tab);
+    if (state[tab].terminated) showKoBanner(tab);
+  }
 }
 
 // ── INIT ──
@@ -404,5 +406,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initial render
-  TABS.forEach(tab => recalc(tab));
+  TABS.forEach(tab => {
+    recalc(tab);
+    if (state[tab].terminated) showKoBanner(tab);
+  });
 });
