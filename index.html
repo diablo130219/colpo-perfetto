@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colpo Perfetto — Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>🎯 Colpo Perfetto</h1>
+      <span class="subtitle">Puntata progressiva con accantonamento</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('cp1')">Colpo Perfetto 1</button>
+      <button class="tab" onclick="showTab('cp2')">Colpo Perfetto 2</button>
+      <button class="tab" onclick="showTab('cp3')">Colpo Perfetto 3</button>
+      <button class="tab" onclick="showTab('bilancio')">Bilancio</button>
+      <button class="tab" onclick="showTab('taccuino')">Taccuino</button>
+    </div>
+
+    <!-- CP1 -->
+    <div id="cp1" class="section active">
+      <div class="card">
+        <div class="cp-header">
+          <h2>Impostazioni</h2>
+          <button class="btn-reset" onclick="resetCP('cp1')">Azzera sessione</button>
+        </div>
+        <div class="setup-grid">
+          <div class="field">
+            <label>Cassa (€)</label>
+            <input type="number" id="cp1-cassa" value="35" step="0.01" oninput="calcCP('cp1')">
+          </div>
+          <div class="field">
+            <label>Stake (%)</label>
+            <input type="number" id="cp1-stake" value="10" step="0.1" oninput="calcCP('cp1')">
+          </div>
+          <div class="field">
+            <label>% Commissione</label>
+            <input type="number" id="cp1-comm" value="0" step="0.1" oninput="calcCP('cp1')">
+          </div>
+        </div>
+        <div class="magazzino-box">
+          <span class="mag-label">💰 Magazzino accantonato</span>
+          <span class="mag-value" id="cp1-magazzino">€ 0.00</span>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="m-label">Stake giocata</div><div class="m-value" id="cp1-stake-val">€ 0.00</div></div>
+          <div class="metric"><div class="m-label">Return</div><div class="m-value" id="cp1-return">€ 0.00</div></div>
+          <div class="metric"><div class="m-label">Prof/Loss</div><div class="m-value" id="cp1-pl">€ 0.00</div></div>
+          <div class="metric"><div class="m-label">Resa %</div><div class="m-value" id="cp1-resa">0.00%</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Giocate</h2>
+        <div class="table-wrap">
+          <table class="giocate-table">
+            <thead>
+              <tr><th>#</th><th>Evento + Mercato</th><th>Q. Sugg.</th><th>Quota</th><th>Gain lordo</th><th>Gain netto</th><th>Esito</th><th></th></tr>
+            </thead>
+            <tbody id="cp1-rows"></tbody>
+          </table>
+        </div>
+        <div class="add-row">
+          <input type="text" id="cp1-desc" placeholder="Evento + mercato (es. Roma - Lazio Over 2.5)">
+          <input type="number" id="cp1-qsugg" placeholder="Q. sugg." step="0.01">
+          <input type="number" id="cp1-quota" placeholder="Quota" step="0.01">
+          <select id="cp1-esito"><option value="OK">✅ OK</option><option value="KO">❌ KO</option></select>
+          <button class="btn-add" onclick="addRow('cp1')">+ Aggiungi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CP2 -->
+    <div id="cp2" class="section">
+      <div class="card">
+        <div class="cp-header">
+          <h2>Impostazioni</h2>
+          <button class="btn-reset" onclick="resetCP('cp2')">Azzera sessione</button>
+        </div>
+        <div class="setup-grid">
+          <div class="field"><label>Cassa (€)</label><input type="number" id="cp2-cassa" value="0" step="0.01" oninput="calcCP('cp2')"></div>
+          <div class="field"><label>Stake (%)</label><input type="number" id="cp2-stake" value="10" step="0.1" oninput="calcCP('cp2')"></div>
+          <div class="field"><label>% Commissione</label><input type="number" id="cp2-comm" value="0" step="0.1" oninput="calcCP('cp2')"></div>
+        </div>
+        <div class="magazzino-box">
+          <span class="mag-label">💰 Magazzino accantonato</span>
+          <span class="mag-value" id="cp2-magazzino">€ 0.00</span>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="m-label">Stake giocata</div><div class="m-value" id="cp2-stake-val">€ 0.00</div></div>
+          <div class="metric"><div class="m-label">Return</div><div class="m-value" id="cp2-return">€ 0.00</div></div>
+          <div class="metric"><div class="m-label">Prof/Loss</div><div class="m-value" id="cp2-pl">€ 0.00</div></div>
+          <div class="metric"><div class="m-label">Resa %</div><div class="m-value" id="cp2-resa">0.00%</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Giocate</h2>
+        <div class="table-wrap">
+          <table class="giocate-table">
+            <thead><tr><th>#</th><th>Evento + Mercato</th><th>Q. Sugg.</th><th>Quota</th><th>Gain lordo</th><th>Gain netto</th><th>Esito</th><th></th></tr></thead>
+            <tbody id="cp2-rows"></tbody>
+          </table>
+        </div>
+        <div class="add-row">
+          <input type="text" id="cp2-desc" placeholder="Evento + mercato">
+          <input type="number" id="cp2-qsugg" placeholder="Q. sugg." step="0.01">
+          <input type="number" id="cp2-quota" placeholder="Quota" step="0.01">
+          <select id="cp2-esito"><option value="OK">✅ OK</option><option value="KO">❌ KO</option></select>
+          <button class="btn-add" onclick="addRow('cp2')">+ Aggiungi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CP3 -->
+    <div id="cp3" class="section">
+      <div class="card">
+        <div class="cp-header">
+          <h2>Impostazioni</h2>
+          <button class="btn-reset" onclick="resetCP('cp3')">Azzera sessione</button>
+        </div>
+        <div class="setup-grid">
+          <div class="field"><label>Cassa (€)</label><input type="number" id="cp3-cassa" value="0" step="0.01" oninput="calcCP('cp3')"></div>
+          <div class="field"><label>Stake (%)</label><input type="number" id="cp3-stake" value="10" step="0.1" oninput="calcCP('cp3')"></div>
+          <div class="field"><label>% Commissione</label><input type="number" id="cp3-comm" value="0" step="0.1" oninput="calcCP('cp3')"></div>
+        </div>
+        <div class="magazzino-box">
+          <span class="mag-label">💰 Magazzino accantonato</span>
+          <span class="mag-value" id="cp3-magazzino">€ 0.00</span>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="m-label">Stake giocata</div><div class="m-value" id="cp3-stake-val">€ 0.00</div></div>
+          <div class="metric"><div class="m-label">Return</div><div class="m-value" id="cp3-return">€ 0.00</div></div>
+          <div class="metric"><div class="m-label">Prof/Loss</div><div class="m-value" id="cp3-pl">€ 0.00</div></div>
+          <div class="metric"><div class="m-label">Resa %</div><div class="m-value" id="cp3-resa">0.00%</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Giocate</h2>
+        <div class="table-wrap">
+          <table class="giocate-table">
+            <thead><tr><th>#</th><th>Evento + Mercato</th><th>Q. Sugg.</th><th>Quota</th><th>Gain lordo</th><th>Gain netto</th><th>Esito</th><th></th></tr></thead>
+            <tbody id="cp3-rows"></tbody>
+          </table>
+        </div>
+        <div class="add-row">
+          <input type="text" id="cp3-desc" placeholder="Evento + mercato">
+          <input type="number" id="cp3-qsugg" placeholder="Q. sugg." step="0.01">
+          <input type="number" id="cp3-quota" placeholder="Quota" step="0.01">
+          <select id="cp3-esito"><option value="OK">✅ OK</option><option value="KO">❌ KO</option></select>
+          <button class="btn-add" onclick="addRow('cp3')">+ Aggiungi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILANCIO -->
+    <div id="bilancio" class="section">
+      <div class="card">
+        <h2>Bilancio generale</h2>
+        <table class="bilancio-table">
+          <tbody>
+            <tr><td>Colpo Perfetto 1</td><td id="bil-cp1">€ 0.00</td></tr>
+            <tr><td>Colpo Perfetto 2</td><td id="bil-cp2">€ 0.00</td></tr>
+            <tr><td>Colpo Perfetto 3</td><td id="bil-cp3">€ 0.00</td></tr>
+            <tr class="total-row"><td>Totale</td><td id="bil-tot">€ 0.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="metrics">
+        <div class="metric"><div class="m-label">Magazzino CP1</div><div class="m-value" id="bil-mag1">€ 0.00</div></div>
+        <div class="metric"><div class="m-label">Magazzino CP2</div><div class="m-value" id="bil-mag2">€ 0.00</div></div>
+        <div class="metric"><div class="m-label">Magazzino CP3</div><div class="m-value" id="bil-mag3">€ 0.00</div></div>
+        <div class="metric"><div class="m-label">Totale magazzino</div><div class="m-value pos" id="bil-mag-tot">€ 0.00</div></div>
+      </div>
+    </div>
+
+    <!-- TACCUINO -->
+    <div id="taccuino" class="section">
+      <div class="card">
+        <h2>Taccuino storico</h2>
+        <div class="table-wrap">
+          <table class="giocate-table">
+            <thead><tr><th>#</th><th>Data</th><th>CP</th><th>Prof/Loss</th><th>Totale cumulato</th></tr></thead>
+            <tbody id="taccuino-rows">
+              <tr><td colspan="5" class="empty-state">Nessuna sessione chiusa ancora.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="chiudi-buttons">
+          <button class="btn-chiudi" onclick="chiudiCP('cp1')">Chiudi e registra CP1</button>
+          <button class="btn-chiudi" onclick="chiudiCP('cp2')">Chiudi e registra CP2</button>
+          <button class="btn-chiudi" onclick="chiudiCP('cp3')">Chiudi e registra CP3</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
