@@ -73,7 +73,8 @@ function buildPage(tab) {
   const page = g(pid);
   if (!page) return;
 
-  page.className = 'page theme-'+tab;
+  const wasActive = page.classList.contains('active');
+  page.className = 'page theme-'+tab+(wasActive?' active':'');
   page.innerHTML = [
     '<header class="hero">',
     '  <div class="hero-left">',
@@ -210,6 +211,7 @@ function recalc(tab) {
   tbody.innerHTML = '';
   const stepAzz = cfg.stepAzz;
 
+  const terminated = state[tab].terminated;
   rows.forEach((r, idx) => {
     const tr = document.createElement('tr');
     if (r.esito==='ok') tr.classList.add('ok-r');
@@ -222,7 +224,6 @@ function recalc(tab) {
     const qgCell = r.esito!==null
       ? '<span class="qg-badge">'+(r.qGioc?r.qGioc.toFixed(2).replace('.',','):'?')+'</span>'
       : '<input type="text" inputmode="decimal" value="'+(state[tab].steps[idx].qGioc?state[tab].steps[idx].qGioc.toFixed(2).replace('.',','):'')+'" placeholder="es. 1,60" class="qg-inp" onchange="var v=parseFloat(this.value.replace(\',\',\'.\'));if(!isNaN(v)&&v>=1){state[\''+tab+'\'].steps['+idx+'].qGioc=v;recalc(\''+tab+'\');}else{this.value=\'\';}">';
-    const terminated = state[tab].terminated;
     const esitoCell = r.esito==='ok'
       ? '<span class="eok">OK</span>'
       : r.esito==='ko'
