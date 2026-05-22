@@ -71,6 +71,7 @@ function buildPage(tab) {
   const page = g(pid);
   if (!page) return;
 
+  page.className = 'page theme-'+tab;
   page.innerHTML = [
     '<header class="hero">',
     '  <div class="hero-left">',
@@ -294,7 +295,10 @@ function animCounter(el, from, to, dur) {
 // ── Tab switching ──
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
-  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id==='page-'+tab));
+  document.querySelectorAll('.page').forEach(p => {
+    const isActive = p.id === 'page-'+tab;
+    p.classList.toggle('active', isActive);
+  });
   if (tab==='bilancio') buildBilancio();
   else if (tab==='taccuino') buildTaccuino();
   else recalc(tab);
