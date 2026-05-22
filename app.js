@@ -217,8 +217,8 @@ function recalc(tab) {
 
     const descInput = '<input type="text" placeholder="Inserisci evento..." value="'+esc(state[tab].steps[idx].desc)+'" oninput="state[\''+tab+'\'].steps['+idx+'].desc=this.value;saveAll()">';
     const qgCell = r.esito!==null
-      ? '<span class="qg-badge">'+(r.qGioc?r.qGioc.toFixed(2):'?')+'</span>'
-      : '<input type="text" inputmode="decimal" value="'+(state[tab].steps[idx].qGioc||'')+'" placeholder="es. 1,35" class="qg-inp" oninput="var v=parseFloat(this.value.replace(\',\',\'.\'));state[\''+tab+'\'].steps['+idx+'].qGioc=isNaN(v)?null:v;recalc(\''+tab+'\')">';
+      ? '<span class="qg-badge">'+(r.qGioc?r.qGioc.toFixed(2).replace('.',','):'?')+'</span>'
+      : '<input type="text" inputmode="decimal" value="'+(state[tab].steps[idx].qGioc?state[tab].steps[idx].qGioc.toFixed(2).replace('.',','):'')+'" placeholder="es. 1,60" class="qg-inp" onchange="var v=parseFloat(this.value.replace(\',\',\'.\'));if(!isNaN(v)&&v>=1){state[\''+tab+'\'].steps['+idx+'].qGioc=v;recalc(\''+tab+'\');}else{this.value=\'\';}">';
     const esitoCell = r.esito==='ok'
       ? '<span class="eok">OK</span>'
       : r.esito==='ko'
@@ -247,9 +247,9 @@ function setEsito(tab, idx, val) {
   if (val === 'ok') {
     const rows = document.querySelectorAll('#tbody-'+tab+' tr');
     const inp  = rows[idx] && rows[idx].querySelector('td:nth-child(5) input');
-    const raw  = inp ? inp.value.replace(',','.') : '';
+    const raw  = inp ? inp.value.replace(',','.').trim() : '';
     const q    = parseFloat(raw);
-    if (!q||q<1) { alert('Inserisci la quota giocata prima di segnare OK'); return; }
+    if (!q || q < 1) { alert('Inserisci una quota valida (es. 1,60) prima di segnare OK'); return; }
     state[tab].steps[idx].qGioc = q;
   }
   state[tab].steps[idx].esito = val;
