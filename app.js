@@ -190,8 +190,18 @@ function recalc(tab) {
   if (g('sc-stake-'+tab))   g('sc-stake-'+tab).textContent  = np?fe(np.stake):'\u2014';
   if (g('sc-step-'+tab))    g('sc-step-'+tab).textContent   = doneCount+' / '+N;
   if (g('sc-mag-'+tab))     g('sc-mag-'+tab).textContent    = fe(magCum);
-  if (g('sc-rischio-'+tab)) g('sc-rischio-'+tab).textContent= fe(rischio);
-  if (g('sc-return-'+tab))  g('sc-return-'+tab).textContent = fe(returnCur);
+  // rischio: rosso se > 0
+  const rischioEl = g('sc-rischio-'+tab);
+  if (rischioEl) {
+    rischioEl.textContent = fe(rischio);
+    rischioEl.className = 'stat-value ' + (rischio > 0 ? 'red' : 'green');
+  }
+  // return: verde se >= 0, rosso se < 0
+  const returnEl = g('sc-return-'+tab);
+  if (returnEl) {
+    returnEl.textContent = (returnCur >= 0 ? '+' : '') + fe(returnCur);
+    returnEl.className = 'stat-value ' + (returnCur >= 0 ? 'green' : 'red');
+  }
 
   const tbody = g('tbody-'+tab);
   if (!tbody) return;
@@ -208,7 +218,7 @@ function recalc(tab) {
     const descInput = '<input type="text" placeholder="Inserisci evento..." value="'+esc(state[tab].steps[idx].desc)+'" oninput="state[\''+tab+'\'].steps['+idx+'].desc=this.value;saveAll()">';
     const qgCell = r.esito!==null
       ? '<span class="qg-badge">'+(r.qGioc?r.qGioc.toFixed(2):'?')+'</span>'
-      : '<input type="number" value="'+(state[tab].steps[idx].qGioc||'')+'" step="0.05" min="1" placeholder="\u2014" oninput="state[\''+tab+'\'].steps['+idx+'].qGioc=parseFloat(this.value)||null;recalc(\''+tab+'\')">';
+      : '<input type="text" inputmode="decimal" value="'+(state[tab].steps[idx].qGioc||'')+'" placeholder="es. 1,35" class="qg-inp" oninput="var v=parseFloat(this.value.replace(\',\',\'.\'));state[\''+tab+'\'].steps['+idx+'].qGioc=isNaN(v)?null:v;recalc(\''+tab+'\')">';
     const esitoCell = r.esito==='ok'
       ? '<span class="eok">OK</span>'
       : r.esito==='ko'
@@ -237,7 +247,8 @@ function setEsito(tab, idx, val) {
   if (val === 'ok') {
     const rows = document.querySelectorAll('#tbody-'+tab+' tr');
     const inp  = rows[idx] && rows[idx].querySelector('td:nth-child(5) input');
-    const q    = inp ? parseFloat(inp.value) : null;
+    const raw  = inp ? inp.value.replace(',','.') : '';
+    const q    = parseFloat(raw);
     if (!q||q<1) { alert('Inserisci la quota giocata prima di segnare OK'); return; }
     state[tab].steps[idx].qGioc = q;
   }

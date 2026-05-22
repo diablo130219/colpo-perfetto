@@ -549,3 +549,17 @@ input[type=number] { -moz-appearance: textfield; }
   0%,100% { box-shadow: 0 0 0 1px rgba(139,92,246,0.3), 0 0 30px rgba(139,92,246,0.15); }
   50%      { box-shadow: 0 0 0 1px rgba(139,92,246,0.3), 0 0 55px rgba(139,92,246,0.30); }
 }
+
+/* quota input testo (accetta virgola) */
+td input.qg-inp {
+  width: 58px; font-size: 11px; text-align: center; padding: 3px 5px;
+  background: var(--dark4); border: 1px solid var(--border2);
+  border-radius: 4px; color: var(--text); outline: none;
+  font-family: 'DM Mono', monospace; transition: border-color .15s;
+}
+td input.qg-inp:focus { border-color: var(--gold); }
+.theme-cp2 td input.qg-inp:focus { border-color: #3ecf8e; }
+.theme-cp3 td input.qg-inp:focus { border-color: #8b5cf6; }
+
+/* rosso nelle stat card */
+.stat-value.red { color: var(--red); }
