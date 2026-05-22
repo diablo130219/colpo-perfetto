@@ -75,7 +75,29 @@ function buildTaccuino() {
   const totMag = records.reduce((s,r) => s + (r.magCum||0), 0);
   const totRet = records.reduce((s,r) => s + (r.returnCur||0), 0);
 
+  // Cassa disponibile = somma casse iniziali + tutti i return (pos/neg)
+  // La cassa iniziale di ogni sessione è quella impostata dall'utente
+  // Il return di ogni sessione è quanto ha guadagnato/perso (al netto dello stake)
+  const cassaInizTot = records.reduce((s,r) => s + (r.cassa||100), 0);
+  const cassaDisp = parseFloat((cassaInizTot + totRet).toFixed(2));
+  const cassaDiff = parseFloat(totRet.toFixed(2));
+  const cassaClass = cassaDiff >= 0 ? 'green' : 'red';
+
   let html = `
+    <div class="tac-cassa-card">
+      <div class="tac-cassa-left">
+        <div class="tac-cassa-label">Cassa disponibile</div>
+        <div class="tac-cassa-val">${fn(cassaDisp)} €</div>
+        <div class="tac-cassa-sub">
+          Cassa investita: <strong>${fn(cassaInizTot)} €</strong>
+          &nbsp;·&nbsp;
+          Variazione: <strong class="${cassaClass}">${cassaDiff>=0?'+':''}${fn(cassaDiff)} €</strong>
+        </div>
+      </div>
+      <div class="tac-cassa-bar">
+        <div class="tac-cassa-bar-fill" style="width:${Math.min(100, Math.max(0, (cassaDisp/cassaInizTot)*100)).toFixed(1)}%;background:${cassaDiff>=0?'var(--green)':'var(--red)'}"></div>
+      </div>
+    </div>
     <div class="tac-stats">
       <div class="tac-stat">
         <div class="tac-stat-label">Sessioni totali</div>
@@ -90,11 +112,11 @@ function buildTaccuino() {
         <div class="tac-stat-val red">${totNeg}</div>
       </div>
       <div class="tac-stat">
-        <div class="tac-stat-label">Magazzino totale storico</div>
+        <div class="tac-stat-label">Magazzino storico</div>
         <div class="tac-stat-val gold">${fn(totMag)} €</div>
       </div>
       <div class="tac-stat">
-        <div class="tac-stat-label">Return cumulato storico</div>
+        <div class="tac-stat-label">Return cumulato</div>
         <div class="tac-stat-val ${totRet>=0?'green':'red'}">${totRet>=0?'+':''}${fn(totRet)} €</div>
       </div>
     </div>
