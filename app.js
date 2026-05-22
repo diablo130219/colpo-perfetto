@@ -1,246 +1,219 @@
-const state = {
-  cp1: { rows: [], cassa: 35, stake: 10, comm: 0 },
-  cp2: { rows: [], cassa: 0, stake: 10, comm: 0 },
-  cp3: { rows: [], cassa: 0, stake: 10, comm: 0 },
-  taccuino: []
-};
+// ===== COLPO PERFETTO — app.js =====
 
-function showTab(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  const tabs = ['cp1', 'cp2', 'cp3', 'bilancio', 'taccuino'];
-  document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
-  if (id === 'bilancio') updateBilancio();
-  if (id === 'taccuino') renderTaccuino();
-}
+const QSUGG = [
+  1.35, 1.35, 1.40, 1.35, 1.35, 1.35, 1.45, 1.65, 1.65, 1.80,
+  1.40, 1.45, 1.50, 1.50, 1.40, 1.40, 1.40, 1.45, 1.45, 1.55,
+  1.55, 1.55, 1.65, 1.65, 2.46
+];
+const N = 25;
+const STORAGE_KEY = 'colpo_perfetto_state';
 
-function addRow(cp) {
-  const desc = document.getElementById(cp + '-desc').value.trim();
-  const qsugg = parseFloat(document.getElementById(cp + '-qsugg').value) || 0;
-  const quota = parseFloat(document.getElementById(cp + '-quota').value) || 0;
-  const esito = document.getElementById(cp + '-esito').value;
+let steps = [];
 
-  if (!desc) { alert('Inserisci la descrizione evento'); return; }
-  if (!quota) { alert('Inserisci la quota'); return; }
-
-  state[cp].rows.push({ desc, qsugg, quota, esito });
-  document.getElementById(cp + '-desc').value = '';
-  document.getElementById(cp + '-qsugg').value = '';
-  document.getElementById(cp + '-quota').value = '';
-  calcCP(cp);
-  saveToStorage();
-}
-
-function removeRow(cp, idx) {
-  if (!confirm('Rimuovere questa giocata?')) return;
-  state[cp].rows.splice(idx, 1);
-  calcCP(cp);
-  saveToStorage();
-}
-
-function calcCP(cp) {
-  const cassa = parseFloat(document.getElementById(cp + '-cassa').value) || 0;
-  const stakePerc = parseFloat(document.getElementById(cp + '-stake').value) || 0;
-  const comm = parseFloat(document.getElementById(cp + '-comm').value) || 0;
-
-  state[cp].cassa = cassa;
-  state[cp].stake = stakePerc;
-  state[cp].comm = comm;
-
-  const stakeVal = cassa * stakePerc / 100;
-  let magazzino = 0;
-  let returnVal = stakeVal;
-
-  state[cp].rows.forEach(r => {
-    if (r.esito === 'OK') {
-      const gainLordo = returnVal * r.quota;
-      const gainNetto = gainLordo - returnVal;
-      const gainNettoComm = gainNetto * (1 - comm / 100);
-      magazzino += gainNettoComm;
-      r._gainLordo = gainLordo;
-      r._gainNetto = gainNettoComm;
-      returnVal = gainLordo;
-    } else {
-      r._gainLordo = 0;
-      r._gainNetto = -returnVal;
-      returnVal = stakeVal;
-    }
-  });
-
-  const profLoss = magazzino - stakeVal;
-  const resa = stakeVal > 0 ? (profLoss / stakeVal * 100) : 0;
-
-  document.getElementById(cp + '-magazzino').textContent = '€ ' + magazzino.toFixed(2);
-  document.getElementById(cp + '-stake-val').textContent = '€ ' + stakeVal.toFixed(2);
-  document.getElementById(cp + '-return').textContent = '€ ' + returnVal.toFixed(2);
-
-  const plEl = document.getElementById(cp + '-pl');
-  plEl.textContent = '€ ' + profLoss.toFixed(2);
-  plEl.className = 'm-value ' + (profLoss > 0 ? 'pos' : profLoss < 0 ? 'neg' : '');
-
-  document.getElementById(cp + '-resa').textContent = resa.toFixed(2) + '%';
-
-  renderRows(cp, stakeVal);
-  updateBilancio();
-}
-
-function renderRows(cp, stakeVal) {
-  const tbody = document.getElementById(cp + '-rows');
-  const rows = state[cp].rows;
-
-  if (rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Aggiungi giocate qui sotto</td></tr>';
-    return;
+function initSteps() {
+  steps = [];
+  for (let i = 0; i < N; i++) {
+    steps.push({ desc: '', qSugg: QSUGG[i], qGioc: null, esito: null });
   }
-
-  tbody.innerHTML = rows.map((r, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td>${r.desc}</td>
-      <td>${r.qsugg > 0 ? r.qsugg.toFixed(2) : '-'}</td>
-      <td><strong>${r.quota.toFixed(2)}</strong></td>
-      <td>${r._gainLordo > 0 ? '€ ' + r._gainLordo.toFixed(2) : '-'}</td>
-      <td class="${r.esito === 'OK' ? 'esito-ok' : 'esito-ko'}">
-        € ${r._gainNetto !== undefined ? r._gainNetto.toFixed(2) : '0.00'}
-      </td>
-      <td class="${r.esito === 'OK' ? 'esito-ok' : 'esito-ko'}">${r.esito}</td>
-      <td><button class="btn-remove" onclick="removeRow('${cp}', ${i})">✕</button></td>
-    </tr>
-  `).join('');
 }
 
-function updateBilancio() {
-  ['cp1', 'cp2', 'cp3'].forEach((cp, i) => {
-    const cassa = state[cp].cassa;
-    const stakeVal = cassa * state[cp].stake / 100;
-    let magazzino = 0;
-    let returnVal = stakeVal;
+// ---- Persistenza locale ----
+function saveState() {
+  const state = {
+    stakeIniz: document.getElementById('stakeIniz').value,
+    stepAzz:   document.getElementById('stepAzz').value,
+    commP:     document.getElementById('commP').value,
+    pctV:      document.getElementById('pctV').value,
+    steps:     steps
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
 
-    state[cp].rows.forEach(r => {
-      if (r.esito === 'OK') {
-        const gl = returnVal * r.quota;
-        magazzino += gl - returnVal;
-        returnVal = gl;
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    document.getElementById('stakeIniz').value = state.stakeIniz || 3;
+    document.getElementById('stepAzz').value   = state.stepAzz   || 3;
+    document.getElementById('commP').value     = state.commP     || 0;
+    document.getElementById('pctV').value      = state.pctV      || 40;
+    steps = state.steps || [];
+    while (steps.length < N) steps.push({ desc: '', qSugg: QSUGG[steps.length], qGioc: null, esito: null });
+    return true;
+  } catch(e) { return false; }
+}
+
+// ---- Formattazione ----
+function fn(v) { return v.toFixed(2).replace('.', ','); }
+function fe(v) { return fn(v) + ' €'; }
+
+// ---- Calcolo principale ----
+function recalc() {
+  const stakeIniz = parseFloat(document.getElementById('stakeIniz').value) || 3;
+  const commP     = parseFloat(document.getElementById('commP').value) || 0;
+  const stepAzz   = parseInt(document.getElementById('stepAzz').value) || 3;
+  const pctV      = parseFloat(document.getElementById('pctV').value) / 100;
+  const pctR      = 1 - pctV;
+
+  document.getElementById('pctVdisp').textContent  = Math.round(pctV * 100);
+  document.getElementById('pctRdisp').textContent  = Math.round(pctR * 100);
+  document.getElementById('pctRdisp2').textContent = Math.round(pctR * 100);
+  document.getElementById('pctRest').textContent   = Math.round(pctR * 100);
+
+  let stakeCur  = stakeIniz;
+  let magCum    = 0;
+  let returnCur = 0;
+  let doneCount = 0;
+  const rows = [];
+
+  for (let i = 0; i < N; i++) {
+    const s = steps[i];
+    const isFase1 = (i < stepAzz);
+    const stake = parseFloat(stakeCur.toFixed(2));
+
+    let gainLordo = null, gainNetto = null, gainMag = null, returnNew = null;
+
+    if (s.esito === 'ok' && s.qGioc) {
+      const qg = s.qGioc;
+      gainLordo = parseFloat((stake * qg).toFixed(2));
+      const comm = parseFloat((gainLordo * commP / 100).toFixed(2));
+      gainNetto = parseFloat((gainLordo - stake - comm).toFixed(2));
+
+      if (isFase1) {
+        // Fase 1: tutto in magazzino, stake invariato
+        gainMag   = gainNetto;
+        stakeCur  = stake;
       } else {
-        returnVal = stakeVal;
+        // Fase 2: gain diviso tra magazzino e reinvestimento
+        gainMag  = parseFloat((gainNetto * pctV).toFixed(2));
+        const reinvest = parseFloat((gainNetto - gainMag).toFixed(2));
+        stakeCur = parseFloat((stake + reinvest).toFixed(2));
       }
+
+      magCum    = parseFloat((magCum + gainMag).toFixed(2));
+      returnCur = parseFloat((returnCur + gainNetto).toFixed(2));
+      doneCount++;
+
+    } else if (s.esito === 'ko') {
+      gainLordo = 0;
+      gainNetto = parseFloat((-stake).toFixed(2));
+      gainMag   = 0;
+      returnCur = parseFloat((returnCur - stake).toFixed(2));
+      doneCount++;
+    }
+
+    rows.push({
+      i, isFase1, stake,
+      qSugg: s.qSugg || QSUGG[i],
+      qGioc: s.qGioc,
+      gainLordo, gainNetto, gainMag, magCum, returnCur,
+      esito: s.esito
     });
-
-    const pl = magazzino - stakeVal;
-    const el = document.getElementById('bil-cp' + (i + 1));
-    el.textContent = '€ ' + pl.toFixed(2);
-    el.className = pl >= 0 ? 'pos' : 'neg';
-
-    document.getElementById('bil-mag' + (i + 1)).textContent = '€ ' + magazzino.toFixed(2);
-  });
-
-  const vals = [1, 2, 3].map(n => {
-    const txt = document.getElementById('bil-cp' + n).textContent;
-    return parseFloat(txt.replace('€ ', '')) || 0;
-  });
-  const tot = vals.reduce((a, b) => a + b, 0);
-  const totEl = document.getElementById('bil-tot');
-  totEl.textContent = '€ ' + tot.toFixed(2);
-  totEl.className = tot >= 0 ? 'pos' : 'neg';
-
-  const mags = [1, 2, 3].map(n => {
-    const txt = document.getElementById('bil-mag' + n).textContent;
-    return parseFloat(txt.replace('€ ', '')) || 0;
-  });
-  document.getElementById('bil-mag-tot').textContent = '€ ' + mags.reduce((a, b) => a + b, 0).toFixed(2);
-}
-
-function chiudiCP(cp) {
-  if (state[cp].rows.length === 0) {
-    alert('Nessuna giocata da registrare in ' + cp.toUpperCase());
-    return;
   }
-  if (!confirm('Vuoi chiudere e registrare ' + cp.toUpperCase() + ' nel taccuino?')) return;
 
-  const cassa = state[cp].cassa;
-  const stakeVal = cassa * state[cp].stake / 100;
-  let magazzino = 0;
-  let returnVal = stakeVal;
+  const rischio = parseFloat((stakeIniz * stepAzz - magCum).toFixed(2));
+  const np = rows.find(r => r.esito === null);
 
-  state[cp].rows.forEach(r => {
-    if (r.esito === 'OK') {
-      const gl = returnVal * r.quota;
-      magazzino += gl - returnVal;
-      returnVal = gl;
-    } else {
-      returnVal = stakeVal;
-    }
-  });
+  // Aggiorna summary
+  document.getElementById('magTot').textContent = fe(magCum);
+  document.getElementById('mi1').textContent    = doneCount + ' step completati';
+  document.getElementById('mi2').textContent    = 'Stake prossimo: ' + (np ? fe(np.stake) : '—');
+  document.getElementById('s0').textContent     = fe(stakeIniz);
+  document.getElementById('s1').textContent     = np ? fe(np.stake) : '—';
+  document.getElementById('s2').textContent     = doneCount + ' / ' + N;
+  document.getElementById('s3').textContent     = fe(magCum);
+  document.getElementById('s5').textContent     = fe(Math.max(0, rischio));
+  document.getElementById('s6').textContent     = fe(returnCur);
 
-  const pl = magazzino - stakeVal;
-  const oggi = new Date().toLocaleDateString('it-IT');
-  const prev = state.taccuino.reduce((a, r) => a + r.pl, 0);
+  // Costruisci tabella
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
 
-  state.taccuino.push({
-    data: oggi,
-    cp: cp.toUpperCase(),
-    pl,
-    cumul: prev + pl
-  });
+  rows.forEach((r, idx) => {
+    const tr = document.createElement('tr');
+    if (r.esito === 'ok') tr.classList.add('ok-r');
+    if (r.esito === 'ko') tr.classList.add('ko-r');
+    if (idx === stepAzz)  tr.classList.add('phase-sep');
 
-  renderTaccuino();
-  resetCP(cp);
-  saveToStorage();
-  showTab('taccuino');
-}
+    const gnClass = r.gainNetto === null ? 'mu' : (r.gainNetto >= 0 ? 'gp' : 'gng');
+    const gnText  = r.gainNetto !== null ? fe(r.gainNetto) : '—';
 
-function renderTaccuino() {
-  const tbody = document.getElementById('taccuino-rows');
-  if (state.taccuino.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nessuna sessione chiusa ancora. Aggiungi giocate e chiudi una sessione.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = state.taccuino.map((r, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td>${r.data}</td>
-      <td><strong>${r.cp}</strong></td>
-      <td class="${r.pl >= 0 ? 'esito-ok' : 'esito-ko'}">€ ${r.pl.toFixed(2)}</td>
-      <td class="${r.cumul >= 0 ? 'esito-ok' : 'esito-ko'}"><strong>€ ${r.cumul.toFixed(2)}</strong></td>
-    </tr>
-  `).join('');
-}
-
-function resetCP(cp) {
-  state[cp].rows = [];
-  calcCP(cp);
-  saveToStorage();
-}
-
-function saveToStorage() {
-  try {
-    localStorage.setItem('colpo-perfetto', JSON.stringify(state));
-  } catch(e) {}
-}
-
-function loadFromStorage() {
-  try {
-    const saved = localStorage.getItem('colpo-perfetto');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      Object.assign(state, parsed);
-      ['cp1', 'cp2', 'cp3'].forEach(cp => {
-        if (state[cp]) {
-          document.getElementById(cp + '-cassa').value = state[cp].cassa || 0;
-          document.getElementById(cp + '-stake').value = state[cp].stake || 10;
-          document.getElementById(cp + '-comm').value = state[cp].comm || 0;
-          calcCP(cp);
+    tr.innerHTML = `
+      <td style="font-size:10px;color:#6b7599">${r.i + 1}${r.isFase1 ? '<span class="fb">F1</span>' : ''}</td>
+      <td style="font-weight:600">${fe(r.stake)}</td>
+      <td class="dsc">
+        <input type="text" placeholder="Evento..." value="${escHtml(steps[idx].desc)}"
+          onchange="steps[${idx}].desc=this.value;saveState()"/>
+      </td>
+      <td>
+        <input class="qs-inp" type="number" value="${r.qSugg}" step="0.05" min="1"
+          onchange="steps[${idx}].qSugg=parseFloat(this.value)||1.35;recalc();saveState()"/>
+      </td>
+      <td>
+        ${r.esito !== null
+          ? `<span class="qg-badge">${r.qGioc ? r.qGioc.toFixed(2) : '?'}</span>`
+          : `<input type="number" value="${steps[idx].qGioc || ''}" step="0.05" min="1" placeholder="—"
+               onchange="steps[${idx}].qGioc=parseFloat(this.value)||null;recalc()"/>`
         }
-      });
-      renderTaccuino();
-    }
-  } catch(e) {}
+      </td>
+      <td class="mu">${r.gainLordo !== null ? fe(r.gainLordo) : '—'}</td>
+      <td class="${gnClass}">${gnText}</td>
+      <td class="mgv">${r.gainMag !== null && r.esito === 'ok' ? fe(r.gainMag) : '<span class="mu">—</span>'}</td>
+      <td class="mgc">${r.esito !== null ? fe(r.magCum) : '<span class="mu">—</span>'}</td>
+      <td class="ret-v">${r.esito !== null ? fe(r.returnCur) : '<span class="mu">—</span>'}</td>
+      <td>
+        ${r.esito === 'ok'
+          ? '<span class="eok">OK</span>'
+          : r.esito === 'ko'
+          ? '<span class="eko">KO</span>'
+          : `<div class="bw">
+               <button class="bok" onclick="setEsito(${idx},'ok')">OK</button>
+               <button class="bko" onclick="setEsito(${idx},'ko')">KO</button>
+             </div>`
+        }
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  saveState();
 }
 
+function setEsito(idx, val) {
+  if (val === 'ok') {
+    const rows = document.querySelectorAll('#tbody tr');
+    const inp  = rows[idx] ? rows[idx].querySelector('td:nth-child(5) input') : null;
+    const q    = inp ? parseFloat(inp.value) : null;
+    if (!q || q < 1) {
+      alert('Inserisci la quota giocata prima di segnare OK');
+      return;
+    }
+    steps[idx].qGioc = q;
+  }
+  steps[idx].esito = val;
+  recalc();
+}
+
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ---- Event listeners ----
 document.addEventListener('DOMContentLoaded', () => {
-  loadFromStorage();
-  calcCP('cp1');
-  calcCP('cp2');
-  calcCP('cp3');
+  if (!loadState()) initSteps();
+
+  ['stakeIniz', 'stepAzz', 'commP', 'pctV'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => { recalc(); saveState(); });
+  });
+
+  document.getElementById('btnReset').addEventListener('click', () => {
+    if (confirm('Vuoi resettare tutti gli step? I dati non potranno essere recuperati.')) {
+      initSteps();
+      try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+      recalc();
+    }
+  });
+
+  recalc();
 });
