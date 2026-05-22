@@ -231,7 +231,7 @@ function recalc(tab) {
       ? '<span class="eko">KO</span>'
       : terminated
       ? '<span class="esito-blocked">—</span>'
-      : '<div class="bw"><button class="bok" onclick="setEsito(\''+tab+'\','+idx+',\'ok\')">OK</button><button class="bko" onclick="setEsito(\''+tab+'\','+idx+',\'ko\')">KO</button></div>';
+      : '<div class="bw"><button class="bok" data-tab="'+tab+'" data-idx="'+idx+'" data-val="ok">OK</button><button class="bko" data-tab="'+tab+'" data-idx="'+idx+'" data-val="ko">KO</button></div>';
 
     tr.innerHTML =
       '<td>'+(r.i+1)+(r.isFase1?'<span class="fb">F1</span>':'')+'</td>'+
@@ -270,13 +270,16 @@ function setEsito(tab, idx, val) {
     state[tab].terminated = true;
   }
   recalc(tab);
-  if (val === 'ko') showKoBanner(tab);
+  if (val === 'ko') setTimeout(function(){ showKoBanner(tab); }, 50);
 }
 
 // ── KO Banner ──
 function showKoBanner(tab) {
   const container = document.getElementById('ko-container-'+tab);
-  if (!container) return;
+  if (!container) {
+    console.error('ko-container-'+tab+' non trovato nel DOM');
+    return;
+  }
 
   const { magCum, returnCur, doneCount, rischio } = calcTab(tab);
 
@@ -293,6 +296,9 @@ function showKoBanner(tab) {
     '</div></div>'+
     '<button class="ko-banner-btn" onclick="doReset(\''+tab+'\')">&#8635; Salva nel Taccuino e ricomincia</button>'+
     '</div>';
+
+  // Scroll al banner
+  container.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function doReset(tab) {
@@ -383,6 +389,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.id === prefix+tab) { recalc(tab); saveAll(); }
       });
     });
+  });
+
+  // OK / KO buttons nella tabella (delegated)
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.bok, .bko');
+    if (btn && btn.dataset.tab && btn.dataset.idx !== undefined && btn.dataset.val) {
+      setEsito(btn.dataset.tab, parseInt(btn.dataset.idx), btn.dataset.val);
+    }
   });
 
   // Reset buttons
