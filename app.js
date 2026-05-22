@@ -141,7 +141,8 @@ function buildPage(tab) {
     '  <span class="fn-label">Formula Fase 2:</span>',
     '  Stake<sub>n+1</sub> = Stake<sub>n</sub> + GainNetto \u00d7 (1 \u2212 %mag)',
     '  &nbsp;\u00b7&nbsp; <span id="mi2-'+tab+'">Prossimo stake: \u2014</span>',
-    '</div>'
+    '</div>',
+    '<div id="ko-container-'+tab+'"></div>'
   ].join('\n');
 }
 
@@ -274,30 +275,24 @@ function setEsito(tab, idx, val) {
 
 // ── KO Banner ──
 function showKoBanner(tab) {
-  // Rimuovi banner esistente
-  const existing = document.getElementById('ko-banner-'+tab);
-  if (existing) existing.remove();
+  const container = document.getElementById('ko-container-'+tab);
+  if (!container) return;
 
   const { magCum, returnCur, doneCount, rischio } = calcTab(tab);
 
-  const banner = document.createElement('div');
-  banner.id = 'ko-banner-'+tab;
-  banner.className = 'ko-banner';
-  banner.innerHTML =
-    '<div class="ko-banner-icon">⛔</div>'+
+  container.innerHTML =
+    '<div class="ko-banner">'+
+    '<div class="ko-banner-icon">\u26d4</div>'+
     '<div class="ko-banner-body">'+
     '<div class="ko-banner-title">Sessione terminata</div>'+
-    '<div class="ko-banner-sub">Hai perso la cassa del bookmaker. Il magazzino è al sicuro.</div>'+
+    '<div class="ko-banner-sub">Hai perso la cassa del bookmaker. Il magazzino \u00e8 al sicuro.</div>'+
     '<div class="ko-banner-stats">'+
     '<div class="ko-stat"><span>Step raggiunto</span><strong>'+doneCount+' / 25</strong></div>'+
     '<div class="ko-stat"><span>Magazzino salvato</span><strong class="gold">'+fe(magCum)+'</strong></div>'+
     '<div class="ko-stat"><span>Rischio netto</span><strong class="red">'+fe(rischio)+'</strong></div>'+
     '</div></div>'+
-    '<button class="ko-banner-btn" onclick="doReset(\'' + tab + '\')">&#8635; Salva nel Taccuino e ricomincia</button>';
-
-  // Inserisci nel page container, dopo la formula-note
-  const page = document.getElementById('page-'+tab);
-  if (page) page.appendChild(banner);
+    '<button class="ko-banner-btn" onclick="doReset(\''+tab+'\')">&#8635; Salva nel Taccuino e ricomincia</button>'+
+    '</div>';
 }
 
 function doReset(tab) {
@@ -305,8 +300,8 @@ function doReset(tab) {
   taccuinoAdd(tab, { magCum, returnCur, doneCount, rischio, stakeIniz: cfg.stakeIniz, cassa: cfg.cassa, stepAzz: cfg.stepAzz });
   initSteps(tab);
   prevMag[tab] = 0;
-  const banner = document.querySelector('#ko-banner-'+tab);
-  if (banner) banner.remove();
+  const container = document.getElementById('ko-container-'+tab);
+  if (container) container.innerHTML = '';
   recalc(tab);
   saveAll();
 }
