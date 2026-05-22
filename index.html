@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Colpo Perfetto — La scalata a quota 1000</title>
+<title>Colpo Perfetto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -15,123 +15,27 @@
 
 <div class="app">
 
-  <!-- HERO HEADER -->
-  <header class="hero">
-    <div class="hero-left">
-      <div class="hero-eyebrow">Sistema Progressivo</div>
-      <h1 class="hero-title">Colpo <span>Perfetto</span></h1>
-      <div class="hero-sub">La scalata a quota <strong>1000</strong></div>
-    </div>
-    <div class="hero-mag">
-      <div class="mag-ring">
-        <div class="mag-inner">
-          <div class="mag-label-top">MAGAZZINO</div>
-          <div class="mag-amount" id="magTot">0,00 €</div>
-          <div class="mag-label-bot" id="mi1">0 step</div>
-        </div>
-      </div>
-    </div>
-  </header>
+  <!-- TOP NAV TABS -->
+  <nav class="tab-bar">
+    <button class="tab active" data-tab="cp1">Colpo Perfetto 1</button>
+    <button class="tab" data-tab="cp2">Colpo Perfetto 2</button>
+    <button class="tab" data-tab="cp3">Colpo Perfetto 3</button>
+    <button class="tab tab-bilancio" data-tab="bilancio">Bilancio</button>
+  </nav>
 
-  <!-- SETTINGS BAR -->
-  <div class="settings-bar">
-    <div class="setting-group">
-      <label>Stake iniziale</label>
-      <div class="input-wrap"><input type="number" id="stakeIniz" value="3" min="0.1" step="0.1"><span class="unit">€</span></div>
-    </div>
-    <div class="setting-group">
-      <label>Step Fase 1</label>
-      <div class="input-wrap"><input type="number" id="stepAzz" value="3" min="1" max="10" step="1"><span class="unit">#</span></div>
-    </div>
-    <div class="setting-group">
-      <label>% Magazzino F2</label>
-      <div class="input-wrap"><input type="number" id="pctV" value="40" min="0" max="100" step="5"><span class="unit">%</span></div>
-    </div>
-    <div class="setting-group">
-      <label>Commissioni</label>
-      <div class="input-wrap"><input type="number" id="commP" value="0" min="0" max="10" step="0.5"><span class="unit">%</span></div>
-    </div>
-    <button class="btn-reset" id="btnReset">↺ Reset</button>
-  </div>
+  <!-- ===== PAGINE COLPO PERFETTO ===== -->
+  <div id="page-cp1" class="page active"></div>
+  <div id="page-cp2" class="page"></div>
+  <div id="page-cp3" class="page"></div>
 
-  <!-- STATS ROW -->
-  <div class="stats-grid">
-    <div class="stat-card" data-delay="0">
-      <div class="stat-icon">◈</div>
-      <div class="stat-body">
-        <div class="stat-label">Stake prossimo</div>
-        <div class="stat-value" id="s1">3,00 €</div>
-      </div>
+  <!-- ===== PAGINA BILANCIO ===== -->
+  <div id="page-bilancio" class="page">
+    <div class="bil-header">
+      <div class="hero-eyebrow">Riepilogo globale</div>
+      <h2 class="bil-title">Bilancio</h2>
     </div>
-    <div class="stat-card" data-delay="1">
-      <div class="stat-icon">◎</div>
-      <div class="stat-body">
-        <div class="stat-label">Step completati</div>
-        <div class="stat-value" id="s2">0 / 25</div>
-      </div>
-    </div>
-    <div class="stat-card accent" data-delay="2">
-      <div class="stat-icon">◆</div>
-      <div class="stat-body">
-        <div class="stat-label">Magazzino</div>
-        <div class="stat-value gold" id="s3">0,00 €</div>
-      </div>
-    </div>
-    <div class="stat-card" data-delay="3">
-      <div class="stat-icon">◇</div>
-      <div class="stat-body">
-        <div class="stat-label">Rischio netto</div>
-        <div class="stat-value" id="s5">3,00 €</div>
-      </div>
-    </div>
-    <div class="stat-card" data-delay="4">
-      <div class="stat-icon">▲</div>
-      <div class="stat-body">
-        <div class="stat-label">Return totale</div>
-        <div class="stat-value green" id="s6">0,00 €</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PHASE LABELS -->
-  <div class="phase-strip">
-    <div class="phase-pill p1">
-      <span class="pill-dot red"></span>
-      Fase 1 — Azzeramento rischio: stake fisso, gain tutto in magazzino
-    </div>
-    <div class="phase-divider">→</div>
-    <div class="phase-pill p2">
-      <span class="pill-dot gold"></span>
-      Fase 2 — Scalata: <span id="pctVdisp">40</span>% magazzino · <span id="pctRdisp">60</span>% reinvestito nello stake
-    </div>
-  </div>
-
-  <!-- TABLE -->
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th class="col-n">#</th>
-          <th class="col-stk">Stake</th>
-          <th class="col-dsc">Evento + mercato</th>
-          <th class="col-qs">Stake</th>
-          <th class="col-qg">Q. giocata</th>
-          <th class="col-gl">Gain lordo</th>
-          <th class="col-gn">Gain netto</th>
-          <th class="col-gm">→ Mag.</th>
-          <th class="col-mc">Mag. cumul.</th>
-          <th class="col-rt">Return</th>
-          <th class="col-es">Esito</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
-
-  <div class="formula-note">
-    <span class="fn-label">Formula Fase 2:</span>
-    Stake<sub>n+1</sub> = Stake<sub>n</sub> + GainNetto × (1 − %mag) &nbsp;·&nbsp;
-    <span id="mi2">Prossimo stake: —</span>
+    <div class="bil-grid" id="bil-grid"></div>
+    <div class="bil-totals" id="bil-totals"></div>
   </div>
 
 </div>
