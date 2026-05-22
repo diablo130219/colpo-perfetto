@@ -53,6 +53,11 @@ function taccuinoDelete(id) {
   buildTaccuino();
 }
 
+function resetCassa() {
+  try { localStorage.removeItem(CASSA_KEY); } catch(e) {}
+  buildTaccuino();
+}
+
 function aggiornaCAssa() {
   const inp = document.getElementById('cassa-manuale-inp');
   if (!inp) return;
@@ -79,32 +84,12 @@ function buildTaccuino() {
   if (!container) return;
   const records = taccuinoLoad();
 
-  if (records.length === 0) {
-    container.innerHTML = `
-      <div class="tac-empty">
-        <div class="tac-empty-icon">📓</div>
-        <div class="tac-empty-text">Nessuna sessione registrata</div>
-        <div class="tac-empty-sub">Dopo ogni reset, la sessione viene salvata qui automaticamente</div>
-      </div>`;
-    return;
-  }
-
-  // Raggruppa per tab
-  const grouped = {};
-  records.forEach(r => {
-    if (!grouped[r.tab]) grouped[r.tab] = [];
-    grouped[r.tab].push(r);
-  });
-
-  // Stats globali
+  // Calcola stats (anche se vuoto)
   const totPos = records.filter(r => r.esito === 'positivo').length;
   const totNeg = records.filter(r => r.esito === 'negativo').length;
   const totMag = records.reduce((s,r) => s + (r.magCum||0), 0);
   const totRet = records.reduce((s,r) => s + (r.returnCur||0), 0);
 
-  // Cassa disponibile = somma casse iniziali + tutti i return (pos/neg)
-  // La cassa iniziale di ogni sessione è quella impostata dall'utente
-  // Il return di ogni sessione è quanto ha guadagnato/perso (al netto dello stake)
   const cassaManuale = getCassaManuale();
   const cassaBase = cassaManuale !== null ? cassaManuale : 0;
   const cassaDisp = parseFloat((cassaBase + totRet).toFixed(2));
@@ -133,6 +118,7 @@ function buildTaccuino() {
               class="tac-cassa-inp"/>
             <span class="tac-cassa-unit">€</span>
             <button class="tac-cassa-btn" onclick="aggiornaCAssa()">Aggiorna</button>
+            <button class="tac-cassa-btn-reset" onclick="resetCassa()">↺</button>
           </div>
           <div class="tac-cassa-edit-hint">Modifica la cassa di partenza per il calcolo</div>
         </div>
@@ -164,11 +150,18 @@ function buildTaccuino() {
       </div>
     </div>
     <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
-      <button class="btn-tac-clear" onclick="taccuinoClear()">🗑 Cancella tutto storico</button>
+      ${records.length > 0 ? '<button class="btn-tac-clear" onclick="taccuinoClear()">🗑 Cancella tutto storico</button>' : ''}
     </div>`;
 
   // Lista sessioni
   html += `<div class="tac-list">`;
+  if (records.length === 0) {
+    html += `<div class="tac-empty">
+      <div class="tac-empty-icon">📓</div>
+      <div class="tac-empty-text">Nessuna sessione registrata</div>
+      <div class="tac-empty-sub">Dopo ogni KO o reset, la sessione viene salvata qui automaticamente</div>
+    </div>`;
+  }
   records.forEach(r => {
     const pos = r.esito === 'positivo';
     html += `
