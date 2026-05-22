@@ -330,16 +330,16 @@ td input[type=number] {
 }
 td input[type=number]:focus { border-color: var(--gold); }
 
-/* Quota suggerita */
-.qs-inp {
-  width: 48px !important;
-  background: transparent !important;
-  border: none !important;
-  color: var(--gold) !important;
-  font-style: italic; font-weight: 500;
+/* Stake colonna */
+.stk-col {
   font-family: 'DM Mono', monospace;
+  font-weight: 600; font-size: 12px;
+  color: var(--gold2);
+  background: var(--gold-dim);
+  border: 1px solid var(--border3);
+  border-radius: 4px; padding: 2px 7px;
+  display: inline-block;
 }
-.qs-inp:focus { background: var(--dark4) !important; border-radius: 3px; }
 
 /* Quota giocata badge */
 .qg-badge {

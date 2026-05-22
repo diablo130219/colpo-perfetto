@@ -145,10 +145,7 @@ function recalc() {
           value="${esc(steps[idx].desc)}"
           onchange="steps[${idx}].desc=this.value;saveState()"/>
       </td>
-      <td>
-        <input class="qs-inp" type="number" value="${r.qSugg}" step="0.05" min="1"
-          onchange="steps[${idx}].qSugg=parseFloat(this.value)||1.35;recalc();saveState()"/>
-      </td>
+      <td><span class="stk-col">${fe(r.stake)}</span></td>
       <td>
         ${r.esito !== null
           ? `<span class="qg-badge">${r.qGioc ? r.qGioc.toFixed(2) : '?'}</span>`
