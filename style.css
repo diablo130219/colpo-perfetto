@@ -563,3 +563,40 @@ td input.qg-inp:focus { border-color: var(--gold); }
 
 /* rosso nelle stat card */
 .stat-value.red { color: var(--red); }
+
+/* ── KO BANNER ── */
+.ko-banner {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 1.5rem;
+  padding: 1.5rem 1.75rem;
+  background: rgba(255,85,85,0.07);
+  border: 1px solid rgba(255,85,85,0.3);
+  border-left: 4px solid var(--red);
+  border-radius: var(--radius);
+  margin: 1rem 0;
+  animation: fadeUp .3s ease both;
+}
+.ko-banner-icon { font-size: 2rem; flex-shrink: 0; }
+.ko-banner-body { flex: 1; min-width: 200px; }
+.ko-banner-title { font-size: 16px; font-weight: 600; color: var(--red); margin-bottom: 4px; }
+.ko-banner-sub   { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
+.ko-banner-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.ko-stat { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+.ko-stat span { color: var(--text3); }
+.ko-stat strong { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text); }
+.ko-stat strong.gold { color: var(--gold2); }
+.ko-stat strong.red  { color: var(--red); }
+
+.ko-banner-btn {
+  padding: 10px 20px; flex-shrink: 0;
+  background: rgba(255,85,85,0.12);
+  border: 1px solid rgba(255,85,85,0.4);
+  border-radius: var(--radius-sm);
+  color: var(--red); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s; font-family: inherit;
+  white-space: nowrap;
+}
+.ko-banner-btn:hover { background: rgba(255,85,85,0.22); }
+
+/* Step bloccato dopo KO */
+.esito-blocked { color: var(--text3); font-size: 16px; }
+tbody tr.blocked-row { opacity: 0.35; pointer-events: none; }

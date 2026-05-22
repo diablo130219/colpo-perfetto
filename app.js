@@ -20,6 +20,7 @@ function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').re
 
 function initSteps(tab) {
   state[tab].steps = [];
+  state[tab].terminated = false;
   for (let i = 0; i < N; i++)
     state[tab].steps.push({ desc:'', qGioc:null, esito:null });
 }
@@ -49,6 +50,7 @@ function loadAll() {
       state[t].steps = (save[t].steps || []).slice(0, N);
       while (state[t].steps.length < N)
         state[t].steps.push({ desc:'', qGioc:null, esito:null });
+      state[t].terminated = state[t].steps.some(s => s.esito === 'ko');
     });
     return true;
   } catch(e) { return false; }
@@ -213,16 +215,20 @@ function recalc(tab) {
     if (r.esito==='ok') tr.classList.add('ok-r');
     if (r.esito==='ko') tr.classList.add('ko-r');
     if (idx===stepAzz)  tr.classList.add('phase-sep');
+    if (terminated && r.esito===null) tr.classList.add('blocked-row');
     const gnClass = r.gainNetto===null?'mu':r.gainNetto>=0?'gp':'gng';
 
     const descInput = '<input type="text" placeholder="Inserisci evento..." value="'+esc(state[tab].steps[idx].desc)+'" oninput="state[\''+tab+'\'].steps['+idx+'].desc=this.value;saveAll()">';
     const qgCell = r.esito!==null
       ? '<span class="qg-badge">'+(r.qGioc?r.qGioc.toFixed(2).replace('.',','):'?')+'</span>'
       : '<input type="text" inputmode="decimal" value="'+(state[tab].steps[idx].qGioc?state[tab].steps[idx].qGioc.toFixed(2).replace('.',','):'')+'" placeholder="es. 1,60" class="qg-inp" onchange="var v=parseFloat(this.value.replace(\',\',\'.\'));if(!isNaN(v)&&v>=1){state[\''+tab+'\'].steps['+idx+'].qGioc=v;recalc(\''+tab+'\');}else{this.value=\'\';}">';
+    const terminated = state[tab].terminated;
     const esitoCell = r.esito==='ok'
       ? '<span class="eok">OK</span>'
       : r.esito==='ko'
       ? '<span class="eko">KO</span>'
+      : terminated
+      ? '<span class="esito-blocked">—</span>'
       : '<div class="bw"><button class="bok" onclick="setEsito(\''+tab+'\','+idx+',\'ok\')">OK</button><button class="bko" onclick="setEsito(\''+tab+'\','+idx+',\'ko\')">KO</button></div>';
 
     tr.innerHTML =
@@ -251,9 +257,58 @@ function setEsito(tab, idx, val) {
     const q    = parseFloat(raw);
     if (!q || q < 1) { alert('Inserisci una quota valida (es. 1,60) prima di segnare OK'); return; }
     state[tab].steps[idx].qGioc = q;
+    state[tab].steps[idx].esito = 'ok';
+  } else {
+    const rows = document.querySelectorAll('#tbody-'+tab+' tr');
+    const inp  = rows[idx] && rows[idx].querySelector('td:nth-child(5) input');
+    const raw  = inp ? inp.value.replace(',','.').trim() : '';
+    const q    = parseFloat(raw);
+    if (!isNaN(q) && q >= 1) state[tab].steps[idx].qGioc = q;
+    state[tab].steps[idx].esito = 'ko';
+    state[tab].terminated = true;
   }
-  state[tab].steps[idx].esito = val;
   recalc(tab);
+  if (val === 'ko') showKoBanner(tab);
+}
+
+// ── KO Banner ──
+function showKoBanner(tab) {
+  const existing = document.querySelector('#ko-banner-'+tab);
+  if (existing) existing.remove();
+
+  const { magCum, returnCur, doneCount, rischio, cfg } = calcTab(tab);
+  const pos = magCum > 0;
+
+  const banner = document.createElement('div');
+  banner.id = 'ko-banner-'+tab;
+  banner.className = 'ko-banner';
+  banner.innerHTML =
+    '<div class="ko-banner-icon">⛔</div>'+
+    '<div class="ko-banner-body">'+
+    '  <div class="ko-banner-title">Sessione terminata</div>'+
+    '  <div class="ko-banner-sub">Hai perso la cassa del bookmaker. Il magazzino è al sicuro.</div>'+
+    '  <div class="ko-banner-stats">'+
+    '    <div class="ko-stat"><span>Step raggiunto</span><strong>'+doneCount+' / 25</strong></div>'+
+    '    <div class="ko-stat"><span>Magazzino salvato</span><strong class="gold">'+fe(magCum)+'</strong></div>'+
+    '    <div class="ko-stat"><span>Rischio netto</span><strong class="red">'+fe(rischio)+'</strong></div>'+
+    '  </div>'+
+    '</div>'+
+    '<button class="ko-banner-btn" onclick="doReset(''+tab+'')">&#8635; Salva nel Taccuino e ricomincia</button>';
+
+  // Inserisci dopo la tabella
+  const tableWrap = document.querySelector('#page-'+tab+' .table-wrap');
+  if (tableWrap) tableWrap.insertAdjacentElement('afterend', banner);
+}
+
+function doReset(tab) {
+  const { magCum, returnCur, doneCount, rischio, cfg } = calcTab(tab);
+  taccuinoAdd(tab, { magCum, returnCur, doneCount, rischio, stakeIniz: cfg.stakeIniz, cassa: cfg.cassa, stepAzz: cfg.stepAzz });
+  initSteps(tab);
+  prevMag[tab] = 0;
+  const banner = document.querySelector('#ko-banner-'+tab);
+  if (banner) banner.remove();
+  recalc(tab);
+  saveAll();
 }
 
 // ── Bilancio ──
@@ -338,14 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const tab = e.target.dataset.tab;
       if (!tab) return;
       if (!confirm('Salvare la sessione nel Taccuino e resettare '+TAB_NAMES[tab]+'?')) return;
-      // Salva nel taccuino PRIMA di resettare
-      const { magCum, returnCur, doneCount, rischio, cfg } = calcTab(tab);
-      taccuinoAdd(tab, { magCum, returnCur, doneCount, rischio, stakeIniz:cfg.stakeIniz, cassa:cfg.cassa, stepAzz:cfg.stepAzz });
-      // Reset
-      initSteps(tab);
-      prevMag[tab] = 0;
-      recalc(tab);
-      saveAll();
+      doReset(tab);
     }
   });
 
