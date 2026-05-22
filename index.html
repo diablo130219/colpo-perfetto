@@ -15,20 +15,19 @@
 
 <div class="app">
 
-  <!-- TOP NAV TABS -->
   <nav class="tab-bar">
     <button class="tab active" data-tab="cp1">Colpo Perfetto 1</button>
     <button class="tab" data-tab="cp2">Colpo Perfetto 2</button>
     <button class="tab" data-tab="cp3">Colpo Perfetto 3</button>
-    <button class="tab tab-bilancio" data-tab="bilancio">Bilancio</button>
+    <div class="tab-spacer"></div>
+    <button class="tab tab-special" data-tab="bilancio">Bilancio</button>
+    <button class="tab tab-special" data-tab="taccuino">Taccuino</button>
   </nav>
 
-  <!-- ===== PAGINE COLPO PERFETTO ===== -->
   <div id="page-cp1" class="page active"></div>
   <div id="page-cp2" class="page"></div>
   <div id="page-cp3" class="page"></div>
 
-  <!-- ===== PAGINA BILANCIO ===== -->
   <div id="page-bilancio" class="page">
     <div class="bil-header">
       <div class="hero-eyebrow">Riepilogo globale</div>
@@ -38,8 +37,17 @@
     <div class="bil-totals" id="bil-totals"></div>
   </div>
 
+  <div id="page-taccuino" class="page">
+    <div class="bil-header">
+      <div class="hero-eyebrow">Storico sessioni</div>
+      <h2 class="bil-title">Taccuino</h2>
+    </div>
+    <div id="taccuino-content"></div>
+  </div>
+
 </div>
 
 <script src="app.js"></script>
+<script src="taccuino.js"></script>
 </body>
 </html>
