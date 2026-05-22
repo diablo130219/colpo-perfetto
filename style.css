@@ -640,3 +640,38 @@ tbody tr.blocked-row { opacity: 0.35; pointer-events: none; }
   height: 100%; border-radius: 2px;
   transition: width .6s ease;
 }
+
+/* ── TACCUINO CASSA EDIT ── */
+.tac-cassa-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1rem;
+}
+.tac-cassa-edit { flex-shrink: 0; }
+.tac-cassa-edit-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--text3); margin-bottom: .5rem; font-weight: 500;
+}
+.tac-cassa-edit-row {
+  display: flex; align-items: center; gap: 6px;
+}
+.tac-cassa-inp {
+  width: 110px; font-family: 'DM Mono', monospace;
+  font-size: 14px; text-align: right;
+  padding: 7px 10px;
+  background: var(--dark4); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); color: var(--text); outline: none;
+  transition: border-color .2s;
+}
+.tac-cassa-inp:focus { border-color: var(--gold); }
+.tac-cassa-unit { font-size: 13px; color: var(--text3); }
+.tac-cassa-btn {
+  padding: 7px 16px;
+  background: var(--gold-dim); border: 1px solid var(--border3);
+  border-radius: var(--radius-sm); color: var(--gold2);
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all .2s; font-family: inherit;
+}
+.tac-cassa-btn:hover { background: rgba(201,168,76,0.25); }
+.tac-cassa-edit-hint {
+  font-size: 10px; color: var(--text3); margin-top: 5px;
+}

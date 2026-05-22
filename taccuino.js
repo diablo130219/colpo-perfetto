@@ -1,6 +1,19 @@
 // ===== TACCUINO — storico sessioni =====
 
 const TACCUINO_KEY = 'cp_taccuino_v1';
+const CASSA_KEY = 'cp_cassa_iniziale';
+
+function getCassaManuale() {
+  try {
+    const raw = localStorage.getItem(CASSA_KEY);
+    if (raw === null) return null;
+    const val = parseFloat(raw);
+    return isNaN(val) ? null : val;
+  } catch(e) { return null; }
+}
+function setCassaManuale(val) {
+  try { localStorage.setItem(CASSA_KEY, val); } catch(e) {}
+}
 
 function taccuinoLoad() {
   try { return JSON.parse(localStorage.getItem(TACCUINO_KEY)) || []; }
@@ -38,6 +51,20 @@ function taccuinoDelete(id) {
   const records = taccuinoLoad().filter(r => r.id !== id);
   taccuinoSave(records);
   buildTaccuino();
+}
+
+function aggiornaCAssa() {
+  const inp = document.getElementById('cassa-manuale-inp');
+  if (!inp) return;
+  const raw = inp.value.replace(',','.').trim();
+  const val = parseFloat(raw);
+  if (!isNaN(val) && val > 0) {
+    setCassaManuale(val);
+    buildTaccuino();
+  } else {
+    inp.value = '';
+    inp.focus();
+  }
 }
 
 function taccuinoClear() {
@@ -78,24 +105,40 @@ function buildTaccuino() {
   // Cassa disponibile = somma casse iniziali + tutti i return (pos/neg)
   // La cassa iniziale di ogni sessione è quella impostata dall'utente
   // Il return di ogni sessione è quanto ha guadagnato/perso (al netto dello stake)
-  const cassaInizTot = records.reduce((s,r) => s + (r.cassa||100), 0);
-  const cassaDisp = parseFloat((cassaInizTot + totRet).toFixed(2));
+  const cassaManuale = getCassaManuale();
+  const cassaBase = cassaManuale !== null ? cassaManuale : 0;
+  const cassaDisp = parseFloat((cassaBase + totRet).toFixed(2));
   const cassaDiff = parseFloat(totRet.toFixed(2));
   const cassaClass = cassaDiff >= 0 ? 'green' : 'red';
+  const cassaInpVal = cassaManuale !== null ? fn(cassaManuale) : '';
 
   let html = `
     <div class="tac-cassa-card">
-      <div class="tac-cassa-left">
-        <div class="tac-cassa-label">Cassa disponibile</div>
-        <div class="tac-cassa-val">${fn(cassaDisp)} €</div>
-        <div class="tac-cassa-sub">
-          Cassa investita: <strong>${fn(cassaInizTot)} €</strong>
-          &nbsp;·&nbsp;
-          Variazione: <strong class="${cassaClass}">${cassaDiff>=0?'+':''}${fn(cassaDiff)} €</strong>
+      <div class="tac-cassa-top">
+        <div class="tac-cassa-left">
+          <div class="tac-cassa-label">Cassa disponibile</div>
+          <div class="tac-cassa-val">${cassaManuale !== null ? fn(cassaDisp)+" €" : "— €"}</div>
+          <div class="tac-cassa-sub">
+            Cassa iniziale: <strong>${cassaManuale !== null ? fn(cassaManuale)+" €" : "non impostata"}</strong>
+            &nbsp;·&nbsp;
+            Variazione: <strong class="${cassaClass}">${cassaDiff>=0?'+':''}${fn(cassaDiff)} €</strong>
+          </div>
+        </div>
+        <div class="tac-cassa-edit">
+          <div class="tac-cassa-edit-label">Imposta cassa iniziale</div>
+          <div class="tac-cassa-edit-row">
+            <input type="text" inputmode="decimal" id="cassa-manuale-inp"
+              value="${cassaInpVal}"
+              placeholder="es. 150,00"
+              class="tac-cassa-inp"/>
+            <span class="tac-cassa-unit">€</span>
+            <button class="tac-cassa-btn" onclick="aggiornaCAssa()">Aggiorna</button>
+          </div>
+          <div class="tac-cassa-edit-hint">Modifica la cassa di partenza per il calcolo</div>
         </div>
       </div>
       <div class="tac-cassa-bar">
-        <div class="tac-cassa-bar-fill" style="width:${Math.min(100, Math.max(0, (cassaDisp/cassaInizTot)*100)).toFixed(1)}%;background:${cassaDiff>=0?'var(--green)':'var(--red)'}"></div>
+        <div class="tac-cassa-bar-fill" style="width:${Math.min(100, Math.max(0, cassaBase > 0 ? (cassaDisp/cassaBase)*100 : 100)).toFixed(1)}%;background:${cassaDiff>=0?'var(--green)':'var(--red)'}"></div>
       </div>
     </div>
     <div class="tac-stats">
