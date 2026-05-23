@@ -75,13 +75,12 @@ function buildPage(tab) {
 
   const wasActive = page.classList.contains('active');
   page.className = 'page theme-'+tab+(wasActive?' active':'');
+  const heroLeft = tab === 'cp1'
+    ? '  <div class="hero-left"><img src="logo.png" class="hero-logo" alt="Colpo Perfetto"/></div>'
+    : '  <div class="hero-left"><div class="hero-eyebrow">Sistema Progressivo \u00b7 Sessione '+num+'</div><h1 class="hero-title">Colpo <span>Perfetto</span> <em class="hero-num">'+num+'</em></h1><div class="hero-sub">La scalata a quota <strong>1000</strong></div></div>';
   page.innerHTML = [
     '<header class="hero">',
-    '  <div class="hero-left">',
-    '    <div class="hero-eyebrow">Sistema Progressivo \u00b7 Sessione '+num+'</div>',
-    '    <h1 class="hero-title">Colpo <span>Perfetto</span> <em class="hero-num">'+num+'</em></h1>',
-    '    <div class="hero-sub">La scalata a quota <strong>1000</strong></div>',
-    '  </div>',
+    heroLeft,
     '  <div class="hero-mag">',
     '    <div class="mag-ring"><div class="mag-inner">',
     '      <div class="mag-label-top">MAGAZZINO</div>',

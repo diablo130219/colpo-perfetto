@@ -685,3 +685,12 @@ tbody tr.blocked-row { opacity: 0.35; pointer-events: none; }
   cursor: pointer; transition: all .2s; font-family: inherit;
 }
 .tac-cassa-btn-reset:hover { border-color: var(--red); color: var(--red); }
+
+/* ── HERO LOGO ── */
+.hero-logo {
+  max-width: 420px;
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 20px rgba(201,168,76,0.3));
+}
