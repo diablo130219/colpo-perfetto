@@ -718,8 +718,8 @@ tbody tr.blocked-row { opacity: 0.35; pointer-events: none; }
 .theme-cp3 .hero-logo { filter: drop-shadow(0 0 24px rgba(139,92,246,0.24)); }
 
 .hero-logo {
-  max-width: 500px;
-  width: min(100%, 500px);
+  max-width: 430px;
+  width: min(100%, 430px);
   height: auto;
   display: block;
   margin: -0.4rem 0 -0.6rem 0;
