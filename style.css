@@ -717,8 +717,11 @@ tbody tr.blocked-row { opacity: 0.35; pointer-events: none; }
 .theme-cp2 .hero-logo { filter: drop-shadow(0 0 24px rgba(62,207,142,0.22)); }
 .theme-cp3 .hero-logo { filter: drop-shadow(0 0 24px rgba(139,92,246,0.24)); }
 
-@media (max-width: 720px) {
-  .hero { padding: 1.4rem 1.1rem; }
-  .hero-logo { margin: -.8rem 0 -1rem -.5rem; }
-  .hero-sub-logo { font-size: 12px; }
+.hero-logo {
+  max-width: 500px;
+  width: min(100%, 500px);
+  height: auto;
+  display: block;
+  margin: -0.4rem 0 -0.6rem 0;
+  object-fit: contain;
 }
