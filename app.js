@@ -76,9 +76,9 @@ function buildPage(tab) {
   const wasActive = page.classList.contains('active');
   page.className = 'page theme-'+tab+(wasActive?' active':'');
   const logoByTab = {
-    cp1: 'assets/logo-cp1-yellow.png',
-    cp2: 'assets/logo-cp2-green.png',
-    cp3: 'assets/logo-cp3-violet.png'
+    cp1: 'logo-cp1-yellow.png',
+    cp2: 'logo-cp2-green.png',
+    cp3: 'logo-cp3-violet.png'
   };
   const heroLeft = [
     '  <div class="hero-left hero-left-logo">',
