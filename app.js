@@ -7,7 +7,7 @@ const QSUGG = [
 ];
 const N = 25;
 const TABS = ['cp1','cp2','cp3'];
-const TAB_NAMES = { cp1:'Colpo Perfetto 1', cp2:'Colpo Perfetto 2', cp3:'Colpo Perfetto 3' };
+const TAB_NAMES = { cp1:'SEGNO FISSO', cp2:'OVER 1.5/OVER 2.5', cp3:'G/G' };
 
 const state = {};
 TABS.forEach(t => { state[t] = { steps:[] }; });
@@ -82,7 +82,7 @@ function buildPage(tab) {
   };
   const heroLeft = [
     '  <div class="hero-left hero-left-logo">',
-    '    <img src="' + logoByTab[tab] + '" class="hero-logo" alt="Colpo Perfetto ' + num + '"/>',
+    '    <img src="' + logoByTab[tab] + '" class="hero-logo" alt="' + TAB_NAMES[tab] + '"/>',
     '    <div class="hero-sub hero-sub-logo">Sessione <strong>' + num + '</strong> · La scalata a quota <strong>1000</strong></div>',
     '  </div>'
   ].join('');

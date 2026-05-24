@@ -70,6 +70,6 @@ colpo_perfetto/
 
 
 ## Loghi inclusi
-- CP1: logo giallo/oro
-- CP2: logo verde/acqua
-- CP3: logo viola
+- SEGNO FISSO: logo giallo/oro
+- OVER 1.5/OVER 2.5: logo verde/acqua
+- G/G: logo viola
