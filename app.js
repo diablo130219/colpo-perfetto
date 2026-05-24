@@ -8,7 +8,6 @@ const QSUGG = [
 const N = 25;
 const TABS = ['cp1','cp2','cp3'];
 const TAB_NAMES = { cp1:'SEGNO FISSO', cp2:'OVER 1.5/OVER 2.5', cp3:'G/G' };
-const TAB_HERO = { cp1:'SEGNO\nFISSO', cp2:'OVER 1.5\nOVER 2.5', cp3:'G/G' };
 
 const state = {};
 TABS.forEach(t => { state[t] = { steps:[] }; });
@@ -82,11 +81,11 @@ function buildPage(tab) {
     cp3: 'logo-cp3-violet.png'
   };
   const heroLeft = [
-    '  <div class="hero-left hero-left-logo" data-market="' + TAB_HERO[tab] + '">',
-    '    <img src="' + logoByTab[tab] + '" class="hero-logo" alt="' + TAB_NAMES[tab] + '"/>',
+    '  <div class="hero-left hero-left-logo">',
+    '    <div class="hero-brand"><img src="' + logoByTab[tab] + '" class="hero-logo" alt="' + TAB_NAMES[tab] + '"/></div>',
     '    <div class="hero-copy">',
-    '      <div class="hero-kicker">Sistema operativo</div>',
-    '      <h1 class="hero-market">' + TAB_NAMES[tab] + '</h1>',
+    '      <div class="hero-badge">Sistema operativo</div>',
+    '      <h1 class="hero-display">' + TAB_NAMES[tab] + '</h1>',
     '      <div class="hero-sub hero-sub-logo">Sessione <strong>' + num + '</strong> · La scalata a quota <strong>1000</strong></div>',
     '    </div>',
     '  </div>'
@@ -244,7 +243,7 @@ function recalc(tab) {
       ? '<span class="eko">KO</span>'
       : terminated
       ? '<span class="esito-blocked">—</span>'
-      : '<div class="bw"><button class="bok" data-tab="'+tab+'" data-idx="'+idx+'" data-val="ok">✓ OK</button><button class="bko" data-tab="'+tab+'" data-idx="'+idx+'" data-val="ko">✕ KO</button></div>';
+      : '<div class="bw"><button class="bok" data-tab="'+tab+'" data-idx="'+idx+'" data-val="ok">OK</button><button class="bko" data-tab="'+tab+'" data-idx="'+idx+'" data-val="ko">KO</button></div>';
 
     tr.innerHTML =
       '<td>'+(r.i+1)+(r.isFase1?'<span class="fb">F1</span>':'')+'</td>'+
