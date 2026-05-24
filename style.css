@@ -694,3 +694,31 @@ tbody tr.blocked-row { opacity: 0.35; pointer-events: none; }
   display: block;
   filter: drop-shadow(0 0 20px rgba(201,168,76,0.3));
 }
+
+
+/* ── LOGHI PERSONALIZZATI PER LE 3 PAGINE ── */
+.hero-left-logo {
+  flex: 1 1 620px;
+  min-width: 260px;
+}
+.hero-logo {
+  max-width: 680px;
+  width: min(100%, 680px);
+  height: auto;
+  display: block;
+  margin: -1.2rem 0 -1.4rem -1rem;
+  object-fit: contain;
+}
+.hero-sub-logo {
+  margin-top: .75rem;
+  padding-left: .25rem;
+}
+.theme-cp1 .hero-logo { filter: drop-shadow(0 0 24px rgba(232,201,109,0.24)); }
+.theme-cp2 .hero-logo { filter: drop-shadow(0 0 24px rgba(62,207,142,0.22)); }
+.theme-cp3 .hero-logo { filter: drop-shadow(0 0 24px rgba(139,92,246,0.24)); }
+
+@media (max-width: 720px) {
+  .hero { padding: 1.4rem 1.1rem; }
+  .hero-logo { margin: -.8rem 0 -1rem -.5rem; }
+  .hero-sub-logo { font-size: 12px; }
+}

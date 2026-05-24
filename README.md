@@ -63,5 +63,13 @@ colpo_perfetto/
 ├── index.html   — struttura della pagina
 ├── style.css    — stile dark theme
 ├── app.js       — logica calcoli + localStorage
+├── taccuino.js  — storico sessioni
+├── assets/      — loghi personalizzati per CP1, CP2, CP3
 └── README.md    — questo file
 ```
+
+
+## Loghi inclusi
+- CP1: logo giallo/oro
+- CP2: logo verde/acqua
+- CP3: logo viola
