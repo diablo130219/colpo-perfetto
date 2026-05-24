@@ -83,7 +83,11 @@ function buildPage(tab) {
   const heroLeft = [
     '  <div class="hero-left hero-left-logo">',
     '    <img src="' + logoByTab[tab] + '" class="hero-logo" alt="' + TAB_NAMES[tab] + '"/>',
-    '    <div class="hero-sub hero-sub-logo">Sessione <strong>' + num + '</strong> · La scalata a quota <strong>1000</strong></div>',
+    '    <div class="hero-copy">',
+    '      <div class="hero-kicker">Sistema operativo</div>',
+    '      <h1 class="hero-market">' + TAB_NAMES[tab] + '</h1>',
+    '      <div class="hero-sub hero-sub-logo">Sessione <strong>' + num + '</strong> · La scalata a quota <strong>1000</strong></div>',
+    '    </div>',
     '  </div>'
   ].join('');
 
