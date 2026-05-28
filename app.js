@@ -6,12 +6,12 @@ const QSUGG = [
   1.55,1.55,1.65,1.65,2.46
 ];
 const N = 25;
-const TABS = ['cp1','cp2','cp3','cp4','cp5','cp6'];
-const TAB_NAMES = { cp1:'MG CASA / MG OSPITE', cp2:'OVER 1.5 CASA', cp3:'OVER 1.5 OSPITE', cp4:'OVER 2.5', cp5:'GG', cp6:'SEGNO FISSO 1' };
+const TABS = ['cp1','cp2','cp3'];
+const TAB_NAMES = { cp1:'MG CASA / MG OSPITE', cp2:'OVER 1.5/OVER 2.5', cp3:'G/G' };
 
 const state = {};
 TABS.forEach(t => { state[t] = { steps:[] }; });
-let prevMag = { cp1:0, cp2:0, cp3:0, cp4:0, cp5:0, cp6:0 };
+let prevMag = { cp1:0, cp2:0, cp3:0 };
 
 function g(id)  { return document.getElementById(id); }
 function fn(v)  { return (+v).toFixed(2).replace('.', ','); }
@@ -78,10 +78,7 @@ function buildPage(tab) {
   const logoByTab = {
     cp1: 'logo-cp1-yellow.png',
     cp2: 'logo-cp2-green.png',
-    cp3: 'logo-cp3-violet.png',
-    cp4: 'logo-cp4.png',
-    cp5: 'logo-cp5.png',
-    cp6: 'logo-cp6.png'
+    cp3: 'logo-cp3-violet.png'
   };
   const heroLeft = [
     '  <div class="hero-left hero-left-logo">',
@@ -334,7 +331,7 @@ function buildBilancio() {
   if (!grid||!tots) return;
   let totalMag=0, totalReturn=0, totalCassa=0;
   grid.innerHTML = '';
-  const colorMap = { cp1:'cp1', cp2:'cp2', cp3:'cp3', cp4:'cp4', cp5:'cp5', cp6:'cp6' };
+  const colorMap = { cp1:'cp1', cp2:'cp2', cp3:'cp3' };
 
   TABS.forEach(tab => {
     const { magCum, returnCur, doneCount, rischio, cfg } = calcTab(tab);
