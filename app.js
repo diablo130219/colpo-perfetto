@@ -7,7 +7,7 @@ const QSUGG = [
 ];
 const N = 25;
 const TABS = ['cp1','cp2','cp3','cp4','cp5','cp6'];
-const TAB_NAMES = { cp1:'MG CASA / MG OSPITE', cp2:'OVER 1.5 CASA', cp3:'OVER 1.5 OSPITE', cp4:'OVER 2.5', cp5:'GG', cp6:'SEGNO FISSO 1' };
+const TAB_NAMES = { cp1:'MG CASA / MG OSPITE', cp2:'OVER 1.5 CASA', cp3:'OVER 1.5 OSPITE', cp4:'OVER 2.5', cp5:'G/G', cp6:'SEGNO FISSO 1' };
 
 const state = {};
 TABS.forEach(t => { state[t] = { steps:[] }; });
@@ -30,13 +30,13 @@ function saveAll() {
   try {
     const save = {};
     TABS.forEach(t => { save[t] = { cfg: getConfig(t), steps: state[t].steps }; });
-    localStorage.setItem('cp_v4', JSON.stringify(save));
+    localStorage.setItem('cp_v6', JSON.stringify(save));
   } catch(e) {}
 }
 
 function loadAll() {
   try {
-    const raw = localStorage.getItem('cp_v4');
+    const raw = localStorage.getItem('cp_v6');
     if (!raw) return false;
     const save = JSON.parse(raw);
     TABS.forEach(t => {
@@ -79,9 +79,9 @@ function buildPage(tab) {
     cp1: 'logo-cp1-yellow.png',
     cp2: 'logo-cp2-green.png',
     cp3: 'logo-cp3-violet.png',
-    cp4: 'logo-cp4.png',
-    cp5: 'logo-cp5.png',
-    cp6: 'logo-cp6.png'
+    cp4: 'logo-cp2-green.png',
+    cp5: 'logo-cp3-violet.png',
+    cp6: 'logo-cp1-yellow.png'
   };
   const heroLeft = [
     '  <div class="hero-left hero-left-logo">',
@@ -334,7 +334,7 @@ function buildBilancio() {
   if (!grid||!tots) return;
   let totalMag=0, totalReturn=0, totalCassa=0;
   grid.innerHTML = '';
-  const colorMap = { cp1:'cp1', cp2:'cp2', cp3:'cp3', cp4:'cp4', cp5:'cp5', cp6:'cp6' };
+  const colorMap = { cp1:'cp1', cp2:'cp2', cp3:'cp3' };
 
   TABS.forEach(tab => {
     const { magCum, returnCur, doneCount, rischio, cfg } = calcTab(tab);
