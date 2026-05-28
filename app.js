@@ -11,7 +11,7 @@ const TAB_NAMES = { cp1:'SEGNO FISSO', cp2:'Over 1.5 Casa', cp3:'G/G', cp4:'Over
 
 const state = {};
 TABS.forEach(t => { state[t] = { steps:[] }; });
-let prevMag = { cp1:0, cp2:0, cp3:0 };
+let prevMag = { cp1:0, cp2:0, cp3:0, cp4:0 };
 
 function g(id)  { return document.getElementById(id); }
 function fn(v)  { return (+v).toFixed(2).replace('.', ','); }
@@ -78,14 +78,15 @@ function buildPage(tab) {
   const logoByTab = {
     cp1: 'logo-cp1-yellow.png',
     cp2: 'logo-cp2-green.png',
-    cp3: 'logo-cp3-violet.png'
+    cp3: 'logo-cp3-violet.png',
+    cp4: 'logo-cp4.png'
   };
   const heroLeft = [
     '  <div class="hero-left hero-left-logo">',
     '    <div class="hero-brand"><img src="' + logoByTab[tab] + '" class="hero-logo" alt="' + TAB_NAMES[tab] + '"/></div>',
     '    <div class="hero-copy">',
     '      <div class="hero-badge">Sistema operativo</div>',
-    '      <h1 class="hero-display">' + (tab === 'cp2' ? 'Over 1.5 Casa' : tab === 'cp4' ? 'Over 1.5 Ospite' : TAB_NAMES[tab]) + '</h1>',
+    '      <h1 class="hero-display">' + TAB_NAMES[tab] + '</h1>',
     '      <div class="hero-sub hero-sub-logo">Sessione <strong>' + num + '</strong> · La scalata a quota <strong>1000</strong></div>',
     '    </div>',
     '  </div>'

@@ -77,6 +77,7 @@ body {
 .tab[data-tab="cp1"].active { color: #e8c96d; border-color: rgba(201,168,76,0.4); box-shadow: 0 0 14px rgba(201,168,76,0.15); }
 .tab[data-tab="cp2"].active { color: #6de8b4; border-color: rgba(62,207,142,0.4);  box-shadow: 0 0 14px rgba(62,207,142,0.15); }
 .tab[data-tab="cp3"].active { color: #c4b5fd; border-color: rgba(139,92,246,0.4);  box-shadow: 0 0 14px rgba(139,92,246,0.15); }
+.tab[data-tab="cp4"].active { color: #fb923c; border-color: rgba(249,115,22,0.45); box-shadow: 0 0 14px rgba(249,115,22,0.18); }
 .tab-bilancio { margin-left: auto; }
 .tab-bilancio.active { color: var(--green); border-color: rgba(62,207,142,0.3); }
 
@@ -326,6 +327,7 @@ td input[type=number]:focus { border-color: var(--gold); }
 .bil-card.cp1::before { background: linear-gradient(90deg, var(--gold), transparent); }
 .bil-card.cp2::before { background: linear-gradient(90deg, var(--green), transparent); }
 .bil-card.cp3::before { background: linear-gradient(90deg, #7c6cf0, transparent); }
+.bil-card.cp4::before { background: linear-gradient(90deg, #f97316, transparent); }
 .bil-card-title {
   font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
   color: var(--text3); margin-bottom: 1rem; font-weight: 500;
@@ -558,6 +560,46 @@ td input.qg-inp {
   font-family: 'DM Mono', monospace; transition: border-color .15s;
 }
 td input.qg-inp:focus { border-color: var(--gold); }
+
+
+/* ── Theme CP4 Orange ── */
+.theme-cp4 .hero            { border-color: rgba(249,115,22,0.35); }
+.theme-cp4 .hero::before    { background: linear-gradient(90deg, transparent, #f97316, transparent); }
+.theme-cp4 .mag-ring        { background: conic-gradient(#f97316 0deg, #fb923c 60deg, var(--dark4) 60deg); box-shadow: 0 0 0 1px rgba(249,115,22,0.3), 0 0 40px rgba(249,115,22,0.20); animation: pulseGlowOrange 4s ease-in-out infinite; }
+.theme-cp4 .mag-inner       { border-color: rgba(249,115,22,0.35); }
+.theme-cp4 .mag-label-top   { color: #f97316; }
+.theme-cp4 .mag-amount      { color: #fb923c; }
+.theme-cp4 .settings-bar    { border-top: 2px solid rgba(249,115,22,0.28); }
+.theme-cp4 .input-wrap:focus-within { border-color: #f97316; }
+.theme-cp4 .stat-card.accent{ border-color: rgba(249,115,22,0.35); background: rgba(249,115,22,0.06); }
+.theme-cp4 .stat-card.accent .stat-icon { color: #f97316; }
+.theme-cp4 .stat-value.gold { color: #fb923c; }
+.theme-cp4 .phase-strip     { border-top: 1px solid rgba(249,115,22,0.12); }
+.theme-cp4 .pill-dot.gold   { background: #f97316; box-shadow: 0 0 6px #f97316; }
+.theme-cp4 .table-wrap      { border-color: rgba(249,115,22,0.2); }
+.theme-cp4 thead tr         { border-bottom-color: rgba(249,115,22,0.25); }
+.theme-cp4 .phase-sep td    { border-top-color: rgba(249,115,22,0.3); }
+.theme-cp4 .stk-col         { color: #fb923c; background: rgba(249,115,22,0.08); border-color: rgba(249,115,22,0.25); }
+.theme-cp4 .qg-badge        { color: #fb923c; background: rgba(249,115,22,0.08); border-color: rgba(249,115,22,0.25); }
+.theme-cp4 .mgv             { color: #f97316; }
+.theme-cp4 .mgc             { color: #fb923c; }
+.theme-cp4 .fn-label        { color: #f97316; }
+.theme-cp4 .hero-eyebrow    { color: #f97316; }
+.theme-cp4 .hero-title span { color: #fb923c; }
+.theme-cp4 .hero-sub strong { color: #fb923c; }
+.theme-cp4 .tab-bar .tab[data-tab="cp4"].active { color: #fb923c; border-color: rgba(249,115,22,0.45); box-shadow: 0 0 14px rgba(249,115,22,0.18); }
+.theme-cp4 td input.qg-inp:focus { border-color: #f97316; }
+.theme-cp4 .hero-logo { filter: drop-shadow(0 0 24px rgba(249,115,22,0.24)); }
+.theme-cp4 .hero-display { color: #fed7aa; text-shadow: 0 0 24px rgba(249,115,22,.18); }
+.theme-cp4 .hero-badge { color: #fb923c; border-color: rgba(249,115,22,.28); background: rgba(249,115,22,.06); }
+.theme-cp4 .stat-card.accent { border-color: rgba(249,115,22,.30); background: linear-gradient(180deg, rgba(249,115,22,.10), rgba(16,20,28,.90)); box-shadow: 0 0 32px rgba(249,115,22,.09); }
+.bil-card.cp4 .bil-card-title { color: #fb923c; }
+
+@keyframes pulseGlowOrange {
+  0%,100% { box-shadow: 0 0 0 1px rgba(249,115,22,.25), 0 0 30px rgba(249,115,22,.14); }
+  50%      { box-shadow: 0 0 0 1px rgba(249,115,22,.35), 0 0 55px rgba(249,115,22,.28); }
+}
+
 .theme-cp2 td input.qg-inp:focus { border-color: #3ecf8e; }
 .theme-cp3 td input.qg-inp:focus { border-color: #8b5cf6; }
 
