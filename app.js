@@ -6,12 +6,12 @@ const QSUGG = [
   1.55,1.55,1.65,1.65,2.46
 ];
 const N = 25;
-const TABS = ['cp1','cp2','cp3','cp4'];
-const TAB_NAMES = { cp1:'SEGNO FISSO', cp2:'Over 1.5 Casa', cp3:'G/G', cp4:'Over 1.5 Ospite' };
+const TABS = ['cp1','cp2','cp3','cp4','cp5'];
+const TAB_NAMES = { cp1:'SEGNO FISSO', cp2:'Over 1.5 Casa', cp3:'G/G', cp4:'Over 1.5 Ospite', cp5:'Over 2.5' };
 
 const state = {};
 TABS.forEach(t => { state[t] = { steps:[] }; });
-let prevMag = { cp1:0, cp2:0, cp3:0, cp4:0 };
+let prevMag = { cp1:0, cp2:0, cp3:0, cp4:0, cp5:0 };
 
 function g(id)  { return document.getElementById(id); }
 function fn(v)  { return (+v).toFixed(2).replace('.', ','); }
@@ -79,7 +79,8 @@ function buildPage(tab) {
     cp1: 'logo-cp1-yellow.png',
     cp2: 'logo-cp2-green.png',
     cp3: 'logo-cp3-violet.png',
-    cp4: 'logo-cp4.png'
+    cp4: 'logo-cp4.png',
+    cp5: 'logo-cp5.png'
   };
   const heroLeft = [
     '  <div class="hero-left hero-left-logo">',
