@@ -77,5 +77,5 @@ colpo_perfetto/
 
 ## Etichette aggiornate
 - CP1: SEGNO FISSO
-- CP2: OVER 1.5/OVER 2.5
+- CP2: Over 1.5 Casa / Over 1.5 Ospite
 - CP3: G/G
