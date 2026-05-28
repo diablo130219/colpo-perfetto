@@ -8,12 +8,12 @@ const QSUGG = [
 const N = 25;
 const TABS = ['cp1','cp2','cp3','cp4','cp5','cp6'];
 const TAB_NAMES = {
-  cp1:'MG Casa / MG Ospite',
-  cp2:'Over 1.5 Casa',
-  cp3:'Over 1.5 Ospite',
-  cp4:'Over 2.5',
-  cp5:'GG',
-  cp6:'Segno fisso 1'
+  cp1: 'MG CASA / MG OSPITE',
+  cp2: 'OVER 1.5 CASA',
+  cp3: 'OVER 1.5 OSPITE',
+  cp4: 'OVER 2.5',
+  cp5: 'G/G',
+  cp6: 'SEGNO FISSO 1'
 };
 
 const state = {};
@@ -37,13 +37,13 @@ function saveAll() {
   try {
     const save = {};
     TABS.forEach(t => { save[t] = { cfg: getConfig(t), steps: state[t].steps }; });
-    localStorage.setItem('cp_v4', JSON.stringify(save));
+    localStorage.setItem('cp_v5', JSON.stringify(save));
   } catch(e) {}
 }
 
 function loadAll() {
   try {
-    const raw = localStorage.getItem('cp_v4');
+    const raw = localStorage.getItem('cp_v5');
     if (!raw) return false;
     const save = JSON.parse(raw);
     TABS.forEach(t => {
@@ -82,14 +82,16 @@ function buildPage(tab) {
 
   const wasActive = page.classList.contains('active');
   page.className = 'page theme-'+tab+(wasActive?' active':'');
+
   const logoByTab = {
     cp1: 'logo-cp1-yellow.png',
     cp2: 'logo-cp2-green.png',
     cp3: 'logo-cp3-violet.png',
-    cp4: 'logo-cp1-yellow.png',
-    cp5: 'logo-cp2-green.png',
-    cp6: 'logo-cp3-violet.png'
+    cp4: 'logo-cp2-green.png',
+    cp5: 'logo-cp3-violet.png',
+    cp6: 'logo-cp1-yellow.png'
   };
+
   const heroLeft = [
     '  <div class="hero-left hero-left-logo">',
     '    <div class="hero-brand"><img src="' + logoByTab[tab] + '" class="hero-logo" alt="' + TAB_NAMES[tab] + '"/></div>',
@@ -216,13 +218,11 @@ function recalc(tab) {
   if (g('sc-stake-'+tab))   g('sc-stake-'+tab).textContent  = np?fe(np.stake):'\u2014';
   if (g('sc-step-'+tab))    g('sc-step-'+tab).textContent   = doneCount+' / '+N;
   if (g('sc-mag-'+tab))     g('sc-mag-'+tab).textContent    = fe(magCum);
-  // rischio: rosso se > 0
   const rischioEl = g('sc-rischio-'+tab);
   if (rischioEl) {
     rischioEl.textContent = fe(rischio);
     rischioEl.className = 'stat-value ' + (rischio > 0 ? 'red' : 'green');
   }
-  // return: verde se >= 0, rosso se < 0
   const returnEl = g('sc-return-'+tab);
   if (returnEl) {
     returnEl.textContent = (returnCur >= 0 ? '+' : '') + fe(returnCur);
@@ -246,13 +246,13 @@ function recalc(tab) {
     const descInput = '<input type="text" placeholder="Inserisci evento..." value="'+esc(state[tab].steps[idx].desc)+'" oninput="state[\''+tab+'\'].steps['+idx+'].desc=this.value;saveAll()">';
     const qgCell = r.esito!==null
       ? '<span class="qg-badge">'+(r.qGioc?r.qGioc.toFixed(2).replace('.',','):'?')+'</span>'
-      : '<input type="text" inputmode="decimal" value="'+(state[tab].steps[idx].qGioc?state[tab].steps[idx].qGioc.toFixed(2).replace('.',','):'')+'" placeholder="es. 1,60" class="qg-inp" onchange="var v=parseFloat(this.value.replace(\',\',\'.\'));if(!isNaN(v)&&v>=1){state[\''+tab+'\'].steps['+idx+'].qGioc=v;recalc(\''+tab+'\');}else{this.value=\'\';}">';
+      : '<input type="text" inputmode="decimal" value="'+(state[tab].steps[idx].qGioc?state[tab].steps[idx].qGioc.toFixed(2).replace('.',','):'\'\')+'" placeholder="es. 1,60" class="qg-inp" onchange="var v=parseFloat(this.value.replace(\',\',\'.\'));if(!isNaN(v)&&v>=1){state[\''+tab+'\'].steps['+idx+'].qGioc=v;recalc(\''+tab+'\');}else{this.value=\'\';}">'.replace("'\\''", "''");
     const esitoCell = r.esito==='ok'
       ? '<span class="eok">OK</span>'
       : r.esito==='ko'
       ? '<span class="eko">KO</span>'
       : terminated
-      ? '<span class="esito-blocked">—</span>'
+      ? '<span class="esito-blocked">\u2014</span>'
       : '<div class="bw"><button class="bok" data-tab="'+tab+'" data-idx="'+idx+'" data-val="ok">OK</button><button class="bko" data-tab="'+tab+'" data-idx="'+idx+'" data-val="ko">KO</button></div>';
 
     tr.innerHTML =
@@ -298,10 +298,7 @@ function setEsito(tab, idx, val) {
 // ── KO Banner ──
 function showKoBanner(tab) {
   const container = document.getElementById('ko-container-'+tab);
-  if (!container) {
-    console.error('ko-container-'+tab+' non trovato nel DOM');
-    return;
-  }
+  if (!container) return;
 
   const { magCum, returnCur, doneCount, rischio } = calcTab(tab);
 
@@ -319,7 +316,6 @@ function showKoBanner(tab) {
     '<button class="ko-banner-btn" onclick="doReset(\''+tab+'\')">&#8635; Salva nel Taccuino e ricomincia</button>'+
     '</div>';
 
-  // Scroll al banner
   container.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
@@ -341,7 +337,6 @@ function buildBilancio() {
   if (!grid||!tots) return;
   let totalMag=0, totalReturn=0, totalCassa=0;
   grid.innerHTML = '';
-  const colorMap = { cp1:'cp1', cp2:'cp2', cp3:'cp3', cp4:'cp4', cp5:'cp5', cp6:'cp6' };
 
   TABS.forEach(tab => {
     const { magCum, returnCur, doneCount, rischio, cfg } = calcTab(tab);
@@ -350,7 +345,7 @@ function buildBilancio() {
     totalCassa  += cfg.cassa;
     const pos = returnCur >= 0;
     grid.innerHTML +=
-      '<div class="bil-card '+colorMap[tab]+'">'+
+      '<div class="bil-card '+tab+'">'+
       '<div class="bil-card-title">'+TAB_NAMES[tab]+'</div>'+
       '<div class="bil-rows">'+
       '<div class="bil-row"><span class="bil-row-label">Cassa iniziale</span><span class="bil-row-val">'+fe(cfg.cassa)+'</span></div>'+
@@ -398,13 +393,10 @@ function switchTab(tab) {
 
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
-  // Build pages
   TABS.forEach(tab => { initSteps(tab); buildPage(tab); });
 
-  // Load saved state (dopo aver costruito le pagine)
   loadAll();
 
-  // Settings listeners
   document.addEventListener('change', e => {
     TABS.forEach(tab => {
       ['cassa-','stakeIniz-','stepAzz-','pctV-','commP-'].forEach(prefix => {
@@ -413,7 +405,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // OK / KO buttons nella tabella (delegated)
   document.addEventListener('click', e => {
     const btn = e.target.closest('.bok, .bko');
     if (btn && btn.dataset.tab && btn.dataset.idx !== undefined && btn.dataset.val) {
@@ -421,7 +412,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Reset buttons
   document.addEventListener('click', e => {
     if (e.target.classList.contains('btn-reset')) {
       const tab = e.target.dataset.tab;
@@ -431,12 +421,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Tab buttons
   document.querySelectorAll('.tab').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  // Initial render
   TABS.forEach(tab => {
     recalc(tab);
     if (state[tab].terminated) showKoBanner(tab);
