@@ -85,7 +85,7 @@ function buildPage(tab) {
     '    <div class="hero-brand"><img src="' + logoByTab[tab] + '" class="hero-logo" alt="' + TAB_NAMES[tab] + '"/></div>',
     '    <div class="hero-copy">',
     '      <div class="hero-badge">Sistema operativo</div>',
-    '      <h1 class="hero-display">' + TAB_NAMES[tab] + '</h1>',
+    '      <h1 class="hero-display">' + (tab === 'cp2' ? 'Over 1.5 Casa' : TAB_NAMES[tab]) + '</h1>',
     '      <div class="hero-sub hero-sub-logo">Sessione <strong>' + num + '</strong> · La scalata a quota <strong>1000</strong></div>',
     '    </div>',
     '  </div>'
