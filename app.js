@@ -7,7 +7,7 @@ const QSUGG = [
 ];
 const N = 25;
 const TABS = ['cp1','cp2','cp3'];
-const TAB_NAMES = { cp1:'MG CASA / MG OSPITE', cp2:'OVER 1.5/OVER 2.5', cp3:'G/G' };
+const TAB_NAMES = { cp1:'SEGNO FISSO', cp2:'Over 1.5 Casa / Over 1.5 Ospite', cp3:'G/G' };
 
 const state = {};
 TABS.forEach(t => { state[t] = { steps:[] }; });
