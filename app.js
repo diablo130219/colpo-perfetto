@@ -397,7 +397,14 @@ function switchTab(tab) {
 }
 
 // ── INIT ──
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Attendi il caricamento dati cloud prima di inizializzare l'app
+  try {
+    if (window.CP_CLOUD_READY) await window.CP_CLOUD_READY;
+  } catch(e) {
+    console.warn('Cloud sync non disponibile, uso dati locali', e);
+  }
+
   // Build pages
   TABS.forEach(tab => { initSteps(tab); buildPage(tab); });
 
