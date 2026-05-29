@@ -1116,3 +1116,44 @@ td { padding: 8px 7px; }
 .theme-cp6 .stat-card.accent { border-color: rgba(244,114,182,.30); background: linear-gradient(180deg, rgba(244,114,182,.10), rgba(16,20,28,.90)); box-shadow: 0 0 32px rgba(244,114,182,.09); }
 .bil-card.cp6::before { background: linear-gradient(90deg, #f472b6, transparent); }
 .bil-card.cp6 .bil-card-title { color: #f9a8d4; }
+
+/* ── DATA / ORA PARTITA ── */
+.col-date { width: 118px; }
+.col-time { width: 88px; }
+
+td input[type=date],
+td input[type=time],
+td input.date-inp,
+td input.time-inp {
+  width: 100%;
+  min-width: 78px;
+  font-size: 11px;
+  text-align: center;
+  padding: 3px 5px;
+  background: var(--dark4);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  color: var(--text);
+  outline: none;
+  font-family: 'DM Mono', monospace;
+  transition: border-color .15s, background .15s;
+}
+
+td input[type=date]:focus,
+td input[type=time]:focus,
+td input.date-inp:focus,
+td input.time-inp:focus {
+  border-color: var(--gold);
+  background: var(--dark5);
+}
+
+.theme-cp2 td input.date-inp:focus,
+.theme-cp2 td input.time-inp:focus { border-color: #3ecf8e; }
+.theme-cp3 td input.date-inp:focus,
+.theme-cp3 td input.time-inp:focus { border-color: #8b5cf6; }
+.theme-cp4 td input.date-inp:focus,
+.theme-cp4 td input.time-inp:focus { border-color: #f97316; }
+.theme-cp5 td input.date-inp:focus,
+.theme-cp5 td input.time-inp:focus { border-color: #38bdf8; }
+.theme-cp6 td input.date-inp:focus,
+.theme-cp6 td input.time-inp:focus { border-color: #f472b6; }

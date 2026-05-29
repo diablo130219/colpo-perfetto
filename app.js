@@ -22,7 +22,7 @@ function initSteps(tab) {
   state[tab].steps = [];
   state[tab].terminated = false;
   for (let i = 0; i < N; i++)
-    state[tab].steps.push({ desc:'', qGioc:null, esito:null });
+    state[tab].steps.push({ data:'', ora:'', desc:'', qGioc:null, esito:null });
 }
 
 // ── Persist ──
@@ -49,7 +49,8 @@ function loadAll() {
       if (g('commP-'+t))     g('commP-'+t).value     = c.commP     ?? 0;
       state[t].steps = (save[t].steps || []).slice(0, N);
       while (state[t].steps.length < N)
-        state[t].steps.push({ desc:'', qGioc:null, esito:null });
+        state[t].steps.push({ data:'', ora:'', desc:'', qGioc:null, esito:null });
+      state[t].steps = state[t].steps.map(s => Object.assign({ data:'', ora:'', desc:'', qGioc:null, esito:null }, s));
       state[t].terminated = state[t].steps.some(s => s.esito === 'ko');
     });
     return true;
@@ -138,6 +139,8 @@ function buildPage(tab) {
     '<div class="table-wrap"><table>',
     '<thead><tr>',
     '<th class="col-n">#</th>',
+    '<th class="col-date">Data</th>',
+    '<th class="col-time">Ora</th>',
     '<th class="col-stk">Stake</th>',
     '<th class="col-dsc">Evento + mercato</th>',
     '<th class="col-stkcol">Stake usato</th>',
@@ -236,6 +239,8 @@ function recalc(tab) {
     if (terminated && r.esito===null) tr.classList.add('blocked-row');
     const gnClass = r.gainNetto===null?'mu':r.gainNetto>=0?'gp':'gng';
 
+    const dataInput = '<input type="date" class="date-inp" value="'+esc(state[tab].steps[idx].data)+'" oninput="state[\''+tab+'\'].steps['+idx+'].data=this.value;saveAll()">';
+    const oraInput = '<input type="time" class="time-inp" value="'+esc(state[tab].steps[idx].ora)+'" oninput="state[\''+tab+'\'].steps['+idx+'].ora=this.value;saveAll()">';
     const descInput = '<input type="text" placeholder="Inserisci evento..." value="'+esc(state[tab].steps[idx].desc)+'" oninput="state[\''+tab+'\'].steps['+idx+'].desc=this.value;saveAll()">';
     const qgCell = r.esito!==null
       ? '<span class="qg-badge">'+(r.qGioc?r.qGioc.toFixed(2).replace('.',','):'?')+'</span>'
@@ -250,6 +255,8 @@ function recalc(tab) {
 
     tr.innerHTML =
       '<td>'+(r.i+1)+(r.isFase1?'<span class="fb">F1</span>':'')+'</td>'+
+      '<td>'+dataInput+'</td>'+
+      '<td>'+oraInput+'</td>'+
       '<td><span class="stk-val'+(r.isFase1?' fase1':'')+'">'+fe(r.stake)+'</span></td>'+
       '<td class="col-dsc">'+descInput+'</td>'+
       '<td><span class="stk-col">'+fe(r.stake)+'</span></td>'+
@@ -269,7 +276,7 @@ function recalc(tab) {
 function setEsito(tab, idx, val) {
   if (val === 'ok') {
     const rows = document.querySelectorAll('#tbody-'+tab+' tr');
-    const inp  = rows[idx] && rows[idx].querySelector('td:nth-child(5) input');
+    const inp  = rows[idx] && rows[idx].querySelector('input.qg-inp');
     const raw  = inp ? inp.value.replace(',','.').trim() : '';
     const q    = parseFloat(raw);
     if (!q || q < 1) { alert('Inserisci una quota valida (es. 1,60) prima di segnare OK'); return; }
@@ -277,7 +284,7 @@ function setEsito(tab, idx, val) {
     state[tab].steps[idx].esito = 'ok';
   } else {
     const rows = document.querySelectorAll('#tbody-'+tab+' tr');
-    const inp  = rows[idx] && rows[idx].querySelector('td:nth-child(5) input');
+    const inp  = rows[idx] && rows[idx].querySelector('input.qg-inp');
     const raw  = inp ? inp.value.replace(',','.').trim() : '';
     const q    = parseFloat(raw);
     if (!isNaN(q) && q >= 1) state[tab].steps[idx].qGioc = q;
