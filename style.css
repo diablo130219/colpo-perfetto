@@ -1157,3 +1157,133 @@ td input.time-inp:focus {
 .theme-cp5 td input.time-inp:focus { border-color: #38bdf8; }
 .theme-cp6 td input.date-inp:focus,
 .theme-cp6 td input.time-inp:focus { border-color: #f472b6; }
+
+
+/* =========================================================
+   OK / KO — COLORI PERSONALIZZATI PER OGNI CP
+   Aggiunto: pulsanti OK/KO + badge esito coordinati al tema
+   ========================================================= */
+
+/* base premium comune */
+.bok, .bko, .eok, .eko {
+  border-radius: 999px !important;
+  min-width: 44px;
+  height: 28px;
+  padding: 0 12px !important;
+  font-weight: 800;
+  letter-spacing: .7px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.bok:hover, .bko:hover {
+  transform: translateY(-1px);
+}
+
+/* CP1 — ORO */
+.theme-cp1 .bok, .theme-cp1 .eok {
+  color: #fff1b8 !important;
+  background: linear-gradient(180deg, rgba(232,201,109,.30), rgba(111,83,20,.38)) !important;
+  border: 1px solid rgba(232,201,109,.55) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 18px rgba(232,201,109,.16) !important;
+}
+.theme-cp1 .bko, .theme-cp1 .eko {
+  color: #ffb08a !important;
+  background: linear-gradient(180deg, rgba(255,111,74,.22), rgba(92,35,22,.38)) !important;
+  border: 1px solid rgba(255,150,105,.42) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 18px rgba(255,111,74,.12) !important;
+}
+.theme-cp1 .bok:hover { box-shadow: 0 0 24px rgba(232,201,109,.26) !important; }
+.theme-cp1 .bko:hover { box-shadow: 0 0 24px rgba(255,111,74,.22) !important; }
+
+/* CP2 — VERDE */
+.theme-cp2 .bok, .theme-cp2 .eok {
+  color: #9dffd8 !important;
+  background: linear-gradient(180deg, rgba(62,207,142,.30), rgba(12,88,59,.40)) !important;
+  border: 1px solid rgba(109,232,180,.58) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 18px rgba(62,207,142,.18) !important;
+}
+.theme-cp2 .bko, .theme-cp2 .eko {
+  color: #ff8f9a !important;
+  background: linear-gradient(180deg, rgba(255,78,104,.22), rgba(91,20,34,.40)) !important;
+  border: 1px solid rgba(255,110,130,.42) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 18px rgba(255,78,104,.12) !important;
+}
+.theme-cp2 .bok:hover { box-shadow: 0 0 24px rgba(62,207,142,.28) !important; }
+.theme-cp2 .bko:hover { box-shadow: 0 0 24px rgba(255,78,104,.22) !important; }
+
+/* CP3 — VIOLA */
+.theme-cp3 .bok, .theme-cp3 .eok {
+  color: #ddd6fe !important;
+  background: linear-gradient(180deg, rgba(139,92,246,.30), rgba(56,35,120,.42)) !important;
+  border: 1px solid rgba(196,181,253,.55) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 18px rgba(139,92,246,.18) !important;
+}
+.theme-cp3 .bko, .theme-cp3 .eko {
+  color: #f0abfc !important;
+  background: linear-gradient(180deg, rgba(217,70,239,.22), rgba(86,26,96,.40)) !important;
+  border: 1px solid rgba(240,171,252,.42) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 18px rgba(217,70,239,.13) !important;
+}
+.theme-cp3 .bok:hover { box-shadow: 0 0 24px rgba(139,92,246,.28) !important; }
+.theme-cp3 .bko:hover { box-shadow: 0 0 24px rgba(217,70,239,.24) !important; }
+
+/* CP4 — ARANCIO */
+.theme-cp4 .bok, .theme-cp4 .eok {
+  color: #fed7aa !important;
+  background: linear-gradient(180deg, rgba(249,115,22,.32), rgba(104,48,12,.42)) !important;
+  border: 1px solid rgba(251,146,60,.58) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 18px rgba(249,115,22,.18) !important;
+}
+.theme-cp4 .bko, .theme-cp4 .eko {
+  color: #fecaca !important;
+  background: linear-gradient(180deg, rgba(239,68,68,.22), rgba(95,25,25,.40)) !important;
+  border: 1px solid rgba(248,113,113,.44) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 18px rgba(239,68,68,.13) !important;
+}
+.theme-cp4 .bok:hover { box-shadow: 0 0 24px rgba(249,115,22,.28) !important; }
+.theme-cp4 .bko:hover { box-shadow: 0 0 24px rgba(239,68,68,.22) !important; }
+
+/* CP5 — AZZURRO */
+.theme-cp5 .bok, .theme-cp5 .eok {
+  color: #bae6fd !important;
+  background: linear-gradient(180deg, rgba(56,189,248,.32), rgba(12,74,110,.42)) !important;
+  border: 1px solid rgba(125,211,252,.58) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 18px rgba(56,189,248,.18) !important;
+}
+.theme-cp5 .bko, .theme-cp5 .eko {
+  color: #fda4af !important;
+  background: linear-gradient(180deg, rgba(244,63,94,.22), rgba(98,18,40,.40)) !important;
+  border: 1px solid rgba(253,164,175,.44) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 18px rgba(244,63,94,.13) !important;
+}
+.theme-cp5 .bok:hover { box-shadow: 0 0 24px rgba(56,189,248,.30) !important; }
+.theme-cp5 .bko:hover { box-shadow: 0 0 24px rgba(244,63,94,.22) !important; }
+
+/* CP6 — ROSA */
+.theme-cp6 .bok, .theme-cp6 .eok {
+  color: #fce7f3 !important;
+  background: linear-gradient(180deg, rgba(244,114,182,.32), rgba(112,26,73,.42)) !important;
+  border: 1px solid rgba(249,168,212,.58) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 18px rgba(244,114,182,.18) !important;
+}
+.theme-cp6 .bko, .theme-cp6 .eko {
+  color: #fecdd3 !important;
+  background: linear-gradient(180deg, rgba(251,113,133,.24), rgba(97,18,35,.42)) !important;
+  border: 1px solid rgba(251,113,133,.46) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 18px rgba(251,113,133,.13) !important;
+}
+.theme-cp6 .bok:hover { box-shadow: 0 0 24px rgba(244,114,182,.30) !important; }
+.theme-cp6 .bko:hover { box-shadow: 0 0 24px rgba(251,113,133,.24) !important; }
+
+/* righe OK/KO più coerenti con ogni tema */
+.theme-cp1 tbody tr.ok-r { background: rgba(232,201,109,.055) !important; }
+.theme-cp1 tbody tr.ko-r { background: rgba(255,111,74,.055) !important; }
+.theme-cp2 tbody tr.ok-r { background: rgba(62,207,142,.055) !important; }
+.theme-cp2 tbody tr.ko-r { background: rgba(255,78,104,.055) !important; }
+.theme-cp3 tbody tr.ok-r { background: rgba(139,92,246,.055) !important; }
+.theme-cp3 tbody tr.ko-r { background: rgba(217,70,239,.050) !important; }
+.theme-cp4 tbody tr.ok-r { background: rgba(249,115,22,.055) !important; }
+.theme-cp4 tbody tr.ko-r { background: rgba(239,68,68,.055) !important; }
+.theme-cp5 tbody tr.ok-r { background: rgba(56,189,248,.055) !important; }
+.theme-cp5 tbody tr.ko-r { background: rgba(244,63,94,.052) !important; }
+.theme-cp6 tbody tr.ok-r { background: rgba(244,114,182,.055) !important; }
+.theme-cp6 tbody tr.ko-r { background: rgba(251,113,133,.052) !important; }
