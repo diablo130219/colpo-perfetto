@@ -392,11 +392,11 @@ function buildMultiplaPage() {
   page.innerHTML = [
     '<header class="hero">',
     '  <div class="hero-left hero-left-logo">',
-    '    <div class="hero-brand"><img src="logo-cp7.png" class="hero-logo" alt="CP7 Multipla"/></div>',
+    '    <div class="hero-brand"><img src="logo-cp7.png" class="hero-logo" alt="Multipla"/></div>',
     '    <div class="hero-copy">',
     '      <div class="hero-badge">Sistema operativo</div>',
-    '      <h1 class="hero-display">CP7 MULTIPLA</h1>',
-    '      <div class="hero-sub hero-sub-logo">Sessione <strong>7</strong> · Più eventi in una sola giocata</div>',
+    '      <h1 class="hero-display">MULTIPLA</h1>',
+    '      <div class="hero-sub hero-sub-logo">Più eventi in una sola giocata</div>',
     '    </div>',
     '  </div>',
     '  <div class="hero-mag"><div class="mag-ring"><div class="mag-inner">',
@@ -406,7 +406,7 @@ function buildMultiplaPage() {
     '  </div></div></div>',
     '</header>',
     '<div class="settings-bar">',
-    '  <div class="setting-group"><label>Importo giocato CP7</label>',
+    '  <div class="setting-group"><label>Importo giocato</label>',
     '    <div class="input-wrap"><input type="number" id="multi-importo" value="10" min="0.1" step="0.5"><span class="unit">€</span></div></div>',
     '  <button class="btn-reset" id="multi-reset">↺ Reset multipla</button>',
     '</div>',
@@ -511,10 +511,8 @@ function buildBilancio() {
     '<div class="bil-row"><span class="bil-row-label">Rischio netto</span><span class="bil-row-val">'+fe(multiRischio)+'</span></div>'+
     '</div></div>';
 
-  tots.innerHTML =
-    '<div class="bil-tot-item"><div class="bil-tot-label">Cassa + importi investiti</div><div class="bil-tot-val">'+fe(totalCassa)+'</div></div>'+
-    '<div class="bil-tot-item"><div class="bil-tot-label">Magazzino totale</div><div class="bil-tot-val gold">'+fe(totalMag)+'</div></div>'+
-    '<div class="bil-tot-item"><div class="bil-tot-label">Return cumulato CP + Multipla</div><div class="bil-tot-val '+(totalReturn>=0?'green':'red')+'">'+(totalReturn>=0?'+':'')+fe(totalReturn)+'</div></div>';
+  // Riepilogo inferiore rimosso: i dati della Multipla restano solo nella card dedicata del Bilancio.
+  tots.innerHTML = '';
 }
 
 // ── Counter animation ──
