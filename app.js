@@ -490,10 +490,28 @@ function buildBilancio() {
       '</div></div>';
   });
 
+  const multi = calcMultipla();
+  const multiPos = multi.profitto >= 0;
+  const multiRischio = multiplaState.esito === 'ok' ? 0 : multi.importo;
+  totalReturn = parseFloat((totalReturn + multi.profitto).toFixed(2));
+  totalCassa = parseFloat((totalCassa + multi.importo).toFixed(2));
+
+  grid.innerHTML +=
+    '<div class="bil-card multipla">'+
+    '<div class="bil-card-title">MULTIPLA</div>'+
+    '<div class="bil-rows">'+
+    '<div class="bil-row"><span class="bil-row-label">Importo giocato</span><span class="bil-row-val">'+fe(multi.importo)+'</span></div>'+
+    '<div class="bil-row"><span class="bil-row-label">Eventi inseriti</span><span class="bil-step-badge">'+multi.eventi+' / '+MULTI_N+'</span></div>'+
+    '<div class="bil-row"><span class="bil-row-label">Quota totale</span><span class="bil-row-val gold">'+(multi.quotaTot ? fn(multi.quotaTot) : '0,00')+'</span></div>'+
+    '<div class="bil-row"><span class="bil-row-label">Vincita potenziale</span><span class="bil-row-val green">'+fe(multi.vincitaLord)+'</span></div>'+
+    '<div class="bil-row"><span class="bil-row-label">Return totale</span><span class="bil-row-val '+(multiPos?'green':'red')+'">'+(multi.profitto>=0?'+':'')+fe(multi.profitto)+'</span></div>'+
+    '<div class="bil-row"><span class="bil-row-label">Rischio netto</span><span class="bil-row-val">'+fe(multiRischio)+'</span></div>'+
+    '</div></div>';
+
   tots.innerHTML =
-    '<div class="bil-tot-item"><div class="bil-tot-label">Cassa totale investita</div><div class="bil-tot-val">'+fe(totalCassa)+'</div></div>'+
+    '<div class="bil-tot-item"><div class="bil-tot-label">Cassa + importi investiti</div><div class="bil-tot-val">'+fe(totalCassa)+'</div></div>'+
     '<div class="bil-tot-item"><div class="bil-tot-label">Magazzino totale</div><div class="bil-tot-val gold">'+fe(totalMag)+'</div></div>'+
-    '<div class="bil-tot-item"><div class="bil-tot-label">Return cumulato</div><div class="bil-tot-val '+(totalReturn>=0?'green':'red')+'">'+(totalReturn>=0?'+':'')+fe(totalReturn)+'</div></div>';
+    '<div class="bil-tot-item"><div class="bil-tot-label">Return cumulato CP + Multipla</div><div class="bil-tot-val '+(totalReturn>=0?'green':'red')+'">'+(totalReturn>=0?'+':'')+fe(totalReturn)+'</div></div>';
 }
 
 // ── Counter animation ──

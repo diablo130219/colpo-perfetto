@@ -1316,3 +1316,8 @@ td input.time-inp:focus {
   min-width: 78px;
   text-align: center;
 }
+
+/* Bilancio — card Multipla */
+.bil-card.multipla::before { background: linear-gradient(90deg, #f8e7a6, transparent); }
+.bil-card.multipla .bil-card-title { color: #f8e7a6; }
+.bil-card.multipla { border-color: rgba(248,231,166,.18); }
