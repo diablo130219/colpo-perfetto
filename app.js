@@ -387,13 +387,16 @@ function calcMultipla() {
 function buildMultiplaPage() {
   const page = g('page-multipla');
   if (!page) return;
+  const wasActive = page.classList.contains('active');
+  page.className = 'page theme-cp7' + (wasActive ? ' active' : '');
   page.innerHTML = [
-    '<header class="hero multi-hero">',
-    '  <div class="hero-left">',
+    '<header class="hero">',
+    '  <div class="hero-left hero-left-logo">',
+    '    <div class="hero-brand"><img src="logo-cp7.png" class="hero-logo" alt="CP7 Multipla"/></div>',
     '    <div class="hero-copy">',
     '      <div class="hero-badge">Sistema operativo</div>',
-    '      <h1 class="hero-display">Multipla</h1>',
-    '      <div class="hero-sub">Più eventi in una sola giocata · quota finale automatica</div>',
+    '      <h1 class="hero-display">CP7 MULTIPLA</h1>',
+    '      <div class="hero-sub hero-sub-logo">Sessione <strong>7</strong> · Più eventi in una sola giocata</div>',
     '    </div>',
     '  </div>',
     '  <div class="hero-mag"><div class="mag-ring"><div class="mag-inner">',
@@ -403,7 +406,7 @@ function buildMultiplaPage() {
     '  </div></div></div>',
     '</header>',
     '<div class="settings-bar">',
-    '  <div class="setting-group"><label>Importo giocato</label>',
+    '  <div class="setting-group"><label>Importo giocato CP7</label>',
     '    <div class="input-wrap"><input type="number" id="multi-importo" value="10" min="0.1" step="0.5"><span class="unit">€</span></div></div>',
     '  <button class="btn-reset" id="multi-reset">↺ Reset multipla</button>',
     '</div>',
