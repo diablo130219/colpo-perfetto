@@ -1287,3 +1287,32 @@ td input.time-inp:focus {
 .theme-cp5 tbody tr.ko-r { background: rgba(244,63,94,.052) !important; }
 .theme-cp6 tbody tr.ok-r { background: rgba(244,114,182,.055) !important; }
 .theme-cp6 tbody tr.ko-r { background: rgba(251,113,133,.052) !important; }
+
+/* MULTIPLA */
+.theme-multipla {
+  --accent: #e8c96d;
+  --accent2: #f9a8d4;
+}
+.theme-multipla .hero-display { color: #f8e7a6; }
+.theme-multipla .bok, .theme-multipla .eok {
+  color: #fff7cc !important;
+  background: linear-gradient(180deg, rgba(232,201,109,.32), rgba(117,83,20,.42)) !important;
+  border: 1px solid rgba(248,231,166,.58) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 18px rgba(232,201,109,.18) !important;
+}
+.theme-multipla .bko, .theme-multipla .eko {
+  color: #fecdd3 !important;
+  background: linear-gradient(180deg, rgba(251,113,133,.24), rgba(97,18,35,.42)) !important;
+  border: 1px solid rgba(251,113,133,.46) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 18px rgba(251,113,133,.13) !important;
+}
+.multi-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .7rem;
+  margin: 1rem 0 2rem;
+}
+.stake-manual-inp {
+  min-width: 78px;
+  text-align: center;
+}

@@ -8,6 +8,8 @@ const QSUGG = [
 const N = 25;
 const TABS = ['cp1','cp2','cp3','cp4','cp5','cp6'];
 const TAB_NAMES = { cp1:'SEGNO FISSO', cp2:'Over 1.5 Casa', cp3:'G/G', cp4:'Over 1.5 Ospite', cp5:'Over 2.5', cp6:'MG Casa / MG Ospite' };
+const MULTI_KEY = 'cp_multipla_v1';
+const MULTI_N = 12;
 
 const state = {};
 TABS.forEach(t => { state[t] = { steps:[] }; });
@@ -22,7 +24,7 @@ function initSteps(tab) {
   state[tab].steps = [];
   state[tab].terminated = false;
   for (let i = 0; i < N; i++)
-    state[tab].steps.push({ data:'', ora:'', desc:'', qGioc:null, esito:null });
+    state[tab].steps.push({ data:'', ora:'', desc:'', qGioc:null, stakeManual:null, esito:null });
 }
 
 // ── Persist ──
@@ -49,8 +51,8 @@ function loadAll() {
       if (g('commP-'+t))     g('commP-'+t).value     = c.commP     ?? 0;
       state[t].steps = (save[t].steps || []).slice(0, N);
       while (state[t].steps.length < N)
-        state[t].steps.push({ data:'', ora:'', desc:'', qGioc:null, esito:null });
-      state[t].steps = state[t].steps.map(s => Object.assign({ data:'', ora:'', desc:'', qGioc:null, esito:null }, s));
+        state[t].steps.push({ data:'', ora:'', desc:'', qGioc:null, stakeManual:null, esito:null });
+      state[t].steps = state[t].steps.map(s => Object.assign({ data:'', ora:'', desc:'', qGioc:null, stakeManual:null, esito:null }, s));
       state[t].terminated = state[t].steps.some(s => s.esito === 'ko');
     });
     return true;
@@ -174,7 +176,7 @@ function calcTab(tab) {
   for (let i = 0; i < N; i++) {
     const s = state[tab].steps[i];
     const isFase1 = (i < stepAzz);
-    const stake = parseFloat(stakeCur.toFixed(2));
+    const stake = parseFloat(((s.stakeManual !== null && !isNaN(parseFloat(s.stakeManual))) ? parseFloat(s.stakeManual) : stakeCur).toFixed(2));
     let gainLordo=null, gainNetto=null, gainMag=null;
     if (s.esito === 'ok' && s.qGioc) {
       gainLordo = parseFloat((stake * s.qGioc).toFixed(2));
@@ -242,9 +244,12 @@ function recalc(tab) {
     const dataInput = '<input type="date" class="date-inp" value="'+esc(state[tab].steps[idx].data)+'" oninput="state[\''+tab+'\'].steps['+idx+'].data=this.value;saveAll()">';
     const oraInput = '<input type="time" class="time-inp" value="'+esc(state[tab].steps[idx].ora)+'" oninput="state[\''+tab+'\'].steps['+idx+'].ora=this.value;saveAll()">';
     const descInput = '<input type="text" placeholder="Inserisci evento..." value="'+esc(state[tab].steps[idx].desc)+'" oninput="state[\''+tab+'\'].steps['+idx+'].desc=this.value;saveAll()">';
+    const stakeInput = r.esito!==null
+      ? '<span class="stk-col">'+fe(r.stake)+'</span>'
+      : '<input type="text" inputmode="decimal" value="'+(state[tab].steps[idx].stakeManual!==null?fn(state[tab].steps[idx].stakeManual):fn(r.stake))+'" placeholder="Importo" class="qg-inp stake-manual-inp" onchange="setManualStake(\''+tab+'\','+idx+',this.value)">';
     const qgCell = r.esito!==null
       ? '<span class="qg-badge">'+(r.qGioc?r.qGioc.toFixed(2).replace('.',','):'?')+'</span>'
-      : '<input type="text" inputmode="decimal" value="'+(state[tab].steps[idx].qGioc?state[tab].steps[idx].qGioc.toFixed(2).replace('.',','):'')+'" placeholder="es. 1,60" class="qg-inp" onchange="var v=parseFloat(this.value.replace(\',\',\'.\'));if(!isNaN(v)&&v>=1){state[\''+tab+'\'].steps['+idx+'].qGioc=v;recalc(\''+tab+'\');}else{this.value=\'\';}">';
+      : '<input type="text" inputmode="decimal" value="'+(state[tab].steps[idx].qGioc?state[tab].steps[idx].qGioc.toFixed(2).replace('.',','):'')+'" placeholder="es. 1,60" class="qg-inp" onchange="var v=parseFloat(this.value.replace(\',\',\'.\'));if(!isNaN(v)&&v>=1){state[\''+tab+'\'].steps['+idx+'].qGioc=v;recalc(\''+tab+'\');saveAll();}else{this.value=\'\';}">';
     const esitoCell = r.esito==='ok'
       ? '<span class="eok">OK</span>'
       : r.esito==='ko'
@@ -259,7 +264,7 @@ function recalc(tab) {
       '<td>'+oraInput+'</td>'+
       '<td><span class="stk-val'+(r.isFase1?' fase1':'')+'">'+fe(r.stake)+'</span></td>'+
       '<td class="col-dsc">'+descInput+'</td>'+
-      '<td><span class="stk-col">'+fe(r.stake)+'</span></td>'+
+      '<td>'+stakeInput+'</td>'+
       '<td>'+qgCell+'</td>'+
       '<td class="mu">'+(r.gainLordo!==null?fe(r.gainLordo):'\u2014')+'</td>'+
       '<td class="'+gnClass+'">'+(r.gainNetto!==null?fe(r.gainNetto):'\u2014')+'</td>'+
@@ -270,6 +275,13 @@ function recalc(tab) {
     tbody.appendChild(tr);
   });
 
+  saveAll();
+}
+
+function setManualStake(tab, idx, raw) {
+  const v = parseFloat(String(raw || '').replace(',', '.'));
+  state[tab].steps[idx].stakeManual = (!isNaN(v) && v > 0) ? v : null;
+  recalc(tab);
   saveAll();
 }
 
@@ -334,6 +346,122 @@ function doReset(tab) {
   saveAll();
 }
 
+
+// ── Multipla ──
+const multiplaState = { rows: [], importo: 10, esito: null };
+
+function initMultipla() {
+  multiplaState.rows = [];
+  for (let i = 0; i < MULTI_N; i++) multiplaState.rows.push({ data:'', ora:'', evento:'', mercato:'', quota:null });
+  multiplaState.importo = 10;
+  multiplaState.esito = null;
+}
+
+function saveMultipla() {
+  try { localStorage.setItem(MULTI_KEY, JSON.stringify(multiplaState)); } catch(e) {}
+}
+
+function loadMultipla() {
+  try {
+    const raw = localStorage.getItem(MULTI_KEY);
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    multiplaState.rows = (saved.rows || []).slice(0, MULTI_N);
+    while (multiplaState.rows.length < MULTI_N) multiplaState.rows.push({ data:'', ora:'', evento:'', mercato:'', quota:null });
+    multiplaState.rows = multiplaState.rows.map(r => Object.assign({ data:'', ora:'', evento:'', mercato:'', quota:null }, r));
+    multiplaState.importo = parseFloat(saved.importo) || 10;
+    multiplaState.esito = saved.esito || null;
+    return true;
+  } catch(e) { return false; }
+}
+
+function calcMultipla() {
+  const quote = multiplaState.rows.map(r => parseFloat(r.quota)).filter(q => !isNaN(q) && q > 1);
+  const quotaTot = quote.length ? parseFloat(quote.reduce((a,b)=>a*b,1).toFixed(2)) : 0;
+  const importo = parseFloat(multiplaState.importo) || 0;
+  const vincitaLord = quotaTot > 0 ? parseFloat((importo * quotaTot).toFixed(2)) : 0;
+  const profitto = multiplaState.esito === 'ok' ? parseFloat((vincitaLord - importo).toFixed(2)) : multiplaState.esito === 'ko' ? -importo : 0;
+  return { eventi: quote.length, quotaTot, importo, vincitaLord, profitto };
+}
+
+function buildMultiplaPage() {
+  const page = g('page-multipla');
+  if (!page) return;
+  page.innerHTML = [
+    '<header class="hero multi-hero">',
+    '  <div class="hero-left">',
+    '    <div class="hero-copy">',
+    '      <div class="hero-badge">Sistema operativo</div>',
+    '      <h1 class="hero-display">Multipla</h1>',
+    '      <div class="hero-sub">Più eventi in una sola giocata · quota finale automatica</div>',
+    '    </div>',
+    '  </div>',
+    '  <div class="hero-mag"><div class="mag-ring"><div class="mag-inner">',
+    '    <div class="mag-label-top">QUOTA TOTALE</div>',
+    '    <div class="mag-amount" id="multi-quota-big">0,00</div>',
+    '    <div class="mag-label-bot" id="multi-eventi-big">0 eventi</div>',
+    '  </div></div></div>',
+    '</header>',
+    '<div class="settings-bar">',
+    '  <div class="setting-group"><label>Importo giocato</label>',
+    '    <div class="input-wrap"><input type="number" id="multi-importo" value="10" min="0.1" step="0.5"><span class="unit">€</span></div></div>',
+    '  <button class="btn-reset" id="multi-reset">↺ Reset multipla</button>',
+    '</div>',
+    '<div class="stats-grid">',
+    '  <div class="stat-card"><div class="stat-icon">◇</div><div class="stat-body"><div class="stat-label">Eventi inseriti</div><div class="stat-value" id="multi-eventi">0</div></div></div>',
+    '  <div class="stat-card accent"><div class="stat-icon">◆</div><div class="stat-body"><div class="stat-label">Quota totale</div><div class="stat-value gold" id="multi-quota">0,00</div></div></div>',
+    '  <div class="stat-card"><div class="stat-icon">◎</div><div class="stat-body"><div class="stat-label">Importo</div><div class="stat-value" id="multi-stake">0,00 €</div></div></div>',
+    '  <div class="stat-card"><div class="stat-icon">▲</div><div class="stat-body"><div class="stat-label">Vincita potenziale</div><div class="stat-value green" id="multi-vincita">0,00 €</div></div></div>',
+    '  <div class="stat-card"><div class="stat-icon">△</div><div class="stat-body"><div class="stat-label">Profitto</div><div class="stat-value" id="multi-profitto">—</div></div></div>',
+    '</div>',
+    '<div class="table-wrap"><table><thead><tr>',
+    '<th class="col-n">#</th><th class="col-date">Data</th><th class="col-time">Ora</th><th class="col-dsc">Evento</th><th class="col-dsc">Mercato</th><th class="col-qg">Quota</th>',
+    '</tr></thead><tbody id="multi-tbody"></tbody></table></div>',
+    '<div class="multi-actions">',
+    '  <button class="bok" id="multi-ok">OK</button>',
+    '  <button class="bko" id="multi-ko">KO</button>',
+    '  <button class="btn-reset" id="multi-clear-esito">Annulla esito</button>',
+    '</div>'
+  ].join('\n');
+}
+
+function recalcMultipla() {
+  const c = calcMultipla();
+  const imp = g('multi-importo');
+  if (imp && document.activeElement !== imp) imp.value = multiplaState.importo;
+  if (g('multi-quota-big')) g('multi-quota-big').textContent = c.quotaTot ? fn(c.quotaTot) : '0,00';
+  if (g('multi-eventi-big')) g('multi-eventi-big').textContent = c.eventi + (c.eventi === 1 ? ' evento' : ' eventi');
+  if (g('multi-eventi')) g('multi-eventi').textContent = c.eventi;
+  if (g('multi-quota')) g('multi-quota').textContent = c.quotaTot ? fn(c.quotaTot) : '0,00';
+  if (g('multi-stake')) g('multi-stake').textContent = fe(c.importo);
+  if (g('multi-vincita')) g('multi-vincita').textContent = fe(c.vincitaLord);
+  const pr = g('multi-profitto');
+  if (pr) {
+    pr.textContent = multiplaState.esito ? (c.profitto >= 0 ? '+' : '') + fe(c.profitto) : '—';
+    pr.className = 'stat-value ' + (!multiplaState.esito ? '' : c.profitto >= 0 ? 'green' : 'red');
+  }
+  const tb = g('multi-tbody');
+  if (!tb) return;
+  tb.innerHTML = '';
+  multiplaState.rows.forEach((r, idx) => {
+    const tr = document.createElement('tr');
+    const dataInput = '<input type="date" class="date-inp" value="'+esc(r.data)+'" oninput="multiplaState.rows['+idx+'].data=this.value;saveMultipla()">';
+    const oraInput = '<input type="time" class="time-inp" value="'+esc(r.ora)+'" oninput="multiplaState.rows['+idx+'].ora=this.value;saveMultipla()">';
+    const eventoInput = '<input type="text" placeholder="Partita / evento" value="'+esc(r.evento)+'" oninput="multiplaState.rows['+idx+'].evento=this.value;saveMultipla()">';
+    const mercatoInput = '<input type="text" placeholder="Mercato" value="'+esc(r.mercato)+'" oninput="multiplaState.rows['+idx+'].mercato=this.value;saveMultipla()">';
+    const quotaInput = '<input type="text" inputmode="decimal" class="qg-inp" placeholder="es. 1,45" value="'+(r.quota?fn(r.quota):'')+'" onchange="var v=parseFloat(this.value.replace(\',\',\'.\')); if(!isNaN(v)&&v>1){multiplaState.rows['+idx+'].quota=v;}else{multiplaState.rows['+idx+'].quota=null;this.value=\'\';} recalcMultipla(); saveMultipla();">';
+    tr.innerHTML = '<td>'+(idx+1)+'</td><td>'+dataInput+'</td><td>'+oraInput+'</td><td class="col-dsc">'+eventoInput+'</td><td class="col-dsc">'+mercatoInput+'</td><td>'+quotaInput+'</td>';
+    tb.appendChild(tr);
+  });
+  saveMultipla();
+}
+
+function resetMultipla() {
+  if (!confirm('Resettare la multipla?')) return;
+  initMultipla();
+  recalcMultipla();
+}
+
 // ── Bilancio ──
 function buildBilancio() {
   const grid = g('bil-grid');
@@ -390,6 +518,7 @@ function switchTab(tab) {
   });
   if (tab==='bilancio') buildBilancio();
   else if (tab==='taccuino') buildTaccuino();
+  else if (tab==='multipla') recalcMultipla();
   else {
     recalc(tab);
     if (state[tab].terminated) showKoBanner(tab);
@@ -400,10 +529,14 @@ function switchTab(tab) {
 document.addEventListener('DOMContentLoaded', async () => {
   // Build pages
   TABS.forEach(tab => { initSteps(tab); buildPage(tab); });
+  initMultipla();
+  buildMultiplaPage();
 
   // Load saved state dal cloud Supabase prima del render locale
   try { if (window.CP_CLOUD_READY) await window.CP_CLOUD_READY; } catch(e) {}
   loadAll();
+  loadMultipla();
+  recalcMultipla();
 
   // Settings listeners
   document.addEventListener('change', e => {
@@ -412,6 +545,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.target.id === prefix+tab) { recalc(tab); saveAll(); }
       });
     });
+  });
+
+  const multiImporto = document.getElementById('multi-importo');
+  if (multiImporto) multiImporto.addEventListener('input', function(){
+    const v = parseFloat(this.value.replace(',', '.'));
+    multiplaState.importo = (!isNaN(v) && v > 0) ? v : 0;
+    recalcMultipla();
+    saveMultipla();
   });
 
   // OK / KO buttons nella tabella (delegated)
@@ -430,6 +571,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!confirm('Salvare la sessione nel Taccuino e resettare '+TAB_NAMES[tab]+'?')) return;
       doReset(tab);
     }
+  });
+
+  document.addEventListener('click', e => {
+    if (e.target.id === 'multi-ok') { multiplaState.esito = 'ok'; recalcMultipla(); saveMultipla(); }
+    if (e.target.id === 'multi-ko') { multiplaState.esito = 'ko'; recalcMultipla(); saveMultipla(); }
+    if (e.target.id === 'multi-clear-esito') { multiplaState.esito = null; recalcMultipla(); saveMultipla(); }
+    if (e.target.id === 'multi-reset') resetMultipla();
   });
 
   // Tab buttons

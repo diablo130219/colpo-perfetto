@@ -6,7 +6,7 @@
   const TABLE_NAME = "colpo_perfetto_app_state";
   const APP_KEY = "colpo_perfetto_main";
 
-  const KEYS = ["cp_v4", "cp_taccuino_v1", "cp_cassa_iniziale"];
+  const KEYS = ["cp_v4", "cp_taccuino_v1", "cp_cassa_iniziale", "cp_multipla_v1"];
   const ENDPOINT = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
 
   let ready = false;
