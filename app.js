@@ -397,11 +397,12 @@ function switchTab(tab) {
 }
 
 // ── INIT ──
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Build pages
   TABS.forEach(tab => { initSteps(tab); buildPage(tab); });
 
-  // Load saved state (dopo aver costruito le pagine)
+  // Load saved state dal cloud Supabase prima del render locale
+  try { if (window.CP_CLOUD_READY) await window.CP_CLOUD_READY; } catch(e) {}
   loadAll();
 
   // Settings listeners
