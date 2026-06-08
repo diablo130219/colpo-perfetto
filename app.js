@@ -424,7 +424,8 @@ function buildMultiplaPage() {
     '  <button class="bok" id="multi-ok">OK</button>',
     '  <button class="bko" id="multi-ko">KO</button>',
     '  <button class="btn-reset" id="multi-clear-esito">Annulla esito</button>',
-    '</div>'
+    '</div>',
+    '<div class="multi-esito-msg" id="multi-esito-msg">Nessun esito selezionato</div>'
   ].join('\n');
 }
 
@@ -443,6 +444,24 @@ function recalcMultipla() {
     pr.textContent = multiplaState.esito ? (c.profitto >= 0 ? '+' : '') + fe(c.profitto) : '—';
     pr.className = 'stat-value ' + (!multiplaState.esito ? '' : c.profitto >= 0 ? 'green' : 'red');
   }
+  const okBtn = g('multi-ok');
+  const koBtn = g('multi-ko');
+  if (okBtn) okBtn.classList.toggle('selected-esito', multiplaState.esito === 'ok');
+  if (koBtn) koBtn.classList.toggle('selected-esito', multiplaState.esito === 'ko');
+  const msg = g('multi-esito-msg');
+  if (msg) {
+    if (multiplaState.esito === 'ok') {
+      msg.textContent = 'Multipla VINTA registrata nel Bilancio: profitto +' + fe(c.profitto);
+      msg.className = 'multi-esito-msg ok';
+    } else if (multiplaState.esito === 'ko') {
+      msg.textContent = 'Multipla PERSA registrata nel Bilancio: perdita -' + fe(c.importo);
+      msg.className = 'multi-esito-msg ko';
+    } else {
+      msg.textContent = 'Nessun esito selezionato';
+      msg.className = 'multi-esito-msg';
+    }
+  }
+
   const tb = g('multi-tbody');
   if (!tb) return;
   tb.innerHTML = '';
@@ -463,6 +482,49 @@ function resetMultipla() {
   if (!confirm('Resettare la multipla?')) return;
   initMultipla();
   recalcMultipla();
+  saveMultipla();
+  if (document.querySelector('#page-bilancio.active')) buildBilancio();
+}
+
+function setMultiplaEsito(val) {
+  const c = calcMultipla();
+  if (val === 'ok' && (c.eventi === 0 || c.quotaTot <= 0)) {
+    alert('Inserisci almeno una quota valida prima di segnare la multipla OK.');
+    return;
+  }
+  if (val === 'ko' && c.importo <= 0) {
+    alert('Inserisci un importo valido prima di segnare la multipla KO.');
+    return;
+  }
+
+  multiplaState.esito = val;
+  recalcMultipla();
+  saveMultipla();
+
+  if (typeof window.CP_CLOUD_SAVE_NOW === 'function') {
+    try { window.CP_CLOUD_SAVE_NOW(); } catch(e) {}
+  }
+
+  if (document.querySelector('#page-bilancio.active')) buildBilancio();
+
+  const msg = g('multi-esito-msg');
+  if (msg) {
+    const cc = calcMultipla();
+    msg.textContent = val === 'ok'
+      ? 'Multipla registrata come VINTA: profitto +' + fe(cc.profitto) + '. Il Bilancio è aggiornato.'
+      : 'Multipla registrata come PERSA: perdita -' + fe(cc.importo) + '. Il Bilancio è aggiornato.';
+    msg.className = 'multi-esito-msg ' + (val === 'ok' ? 'ok' : 'ko');
+  }
+}
+
+function clearMultiplaEsito() {
+  multiplaState.esito = null;
+  recalcMultipla();
+  saveMultipla();
+  if (typeof window.CP_CLOUD_SAVE_NOW === 'function') {
+    try { window.CP_CLOUD_SAVE_NOW(); } catch(e) {}
+  }
+  if (document.querySelector('#page-bilancio.active')) buildBilancio();
 }
 
 // ── Bilancio ──
@@ -593,9 +655,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.addEventListener('click', e => {
-    if (e.target.id === 'multi-ok') { multiplaState.esito = 'ok'; recalcMultipla(); saveMultipla(); }
-    if (e.target.id === 'multi-ko') { multiplaState.esito = 'ko'; recalcMultipla(); saveMultipla(); }
-    if (e.target.id === 'multi-clear-esito') { multiplaState.esito = null; recalcMultipla(); saveMultipla(); }
+    if (e.target.id === 'multi-ok') setMultiplaEsito('ok');
+    if (e.target.id === 'multi-ko') setMultiplaEsito('ko');
+    if (e.target.id === 'multi-clear-esito') clearMultiplaEsito();
     if (e.target.id === 'multi-reset') resetMultipla();
   });
 

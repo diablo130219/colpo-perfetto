@@ -1393,3 +1393,31 @@ td input.time-inp:focus {
   0%,100% { box-shadow: 0 0 0 1px rgba(45,120,255,.30), 0 0 30px rgba(45,120,255,.16); }
   50% { box-shadow: 0 0 0 1px rgba(45,120,255,.45), 0 0 58px rgba(45,120,255,.34); }
 }
+
+
+/* Stato esito Multipla */
+.multi-actions .selected-esito {
+  transform: translateY(-1px) scale(1.03);
+  filter: brightness(1.18);
+  box-shadow: 0 0 26px rgba(248,231,166,.35), inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+.multi-esito-msg {
+  margin: -.35rem 0 1.5rem auto;
+  max-width: 520px;
+  padding: .85rem 1rem;
+  border-radius: 14px;
+  text-align: right;
+  color: rgba(255,255,255,.72);
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.09);
+}
+.multi-esito-msg.ok {
+  color: #86efac;
+  background: rgba(62,207,142,.10);
+  border-color: rgba(62,207,142,.32);
+}
+.multi-esito-msg.ko {
+  color: #fecdd3;
+  background: rgba(251,113,133,.10);
+  border-color: rgba(251,113,133,.32);
+}
